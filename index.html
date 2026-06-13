@@ -40,21 +40,25 @@ th,td{border:1px solid #ccc;padding:6px}
   <button type="button" id="customersBtn" onclick="show('customers')">الزبائن</button>
   <button type="button" id="shopsBtn" onclick="show('shops')">المحلات</button>
   <button type="button" id="factoriesBtn" onclick="show('factories')">المعامل</button>
+  <button type="button" id="inventoryBtn" onclick="show('inventory')">المخزون</button>
   <button type="button" id="invoicesBtn" onclick="show('invoices')">الإيصالات</button>
   <button type="button" id="accountsBtn" onclick="show('accounts')">الحسابات</button>
+  <button type="button" id="reportsBtn" onclick="show('reports')">التقارير</button>
 </nav>
 
-<div id="dashboard" class="page active"><div class="card"><h2 id="dashboardTitle">لوحة التحكم</h2><p id="dashboardDesc">نظام EFA FASHION</p></div></div>
+<div id="dashboard" class="page active"><div class="card"><h2 id="dashboardTitle">لوحة التحكم</h2><p id="dashboardDesc">نظام EFA FASHION</p><button id="backupAllBtn" type="button" onclick="backupAll()">نسخ احتياطي شامل</button> <button id="restoreAllBtn" type="button" onclick="restoreAll()">استعادة شاملة</button></div></div>
 
-<div id="customers" class="page"><div class="card"><h3 id="customersTitle">إضافة زبون</h3><input id="ccode" placeholder="كود الزبون"><input id="cname" placeholder="اسم الزبون"><input id="cphone" placeholder="هاتف"><input id="caddress" placeholder="العنوان"><input id="cnote" placeholder="ملاحظة"><button id="customersSaveBtn" type="button" onclick="addRecord('customersData')">حفظ</button><div id="customersView"></div></div></div>
+<div id="customers" class="page"><div class="card"><h3 id="customersTitle">إضافة زبون</h3><input id="ccode" placeholder="كود الزبون"><input id="cname" placeholder="اسم الزبون"><input id="cphone" placeholder="هاتف"><input id="caddress" placeholder="العنوان"><input id="cnote" placeholder="ملاحظة"><button id="customersSaveBtn" type="button" onclick="addRecord('customersData')">حفظ</button> <button id="customersExportBtn" type="button" onclick="exportData('efa_customers.json','customersData')">تصدير</button> <button id="customersImportBtn" type="button" onclick="importData('customersData')">استيراد</button><input id="custSearch" oninput="load()" placeholder="بحث"><div id="customersView"></div></div></div>
 
-<div id="shops" class="page"><div class="card"><h3 id="shopsTitle">إضافة محل</h3><input id="scode" placeholder="كود المحل"><input id="sname" placeholder="اسم المحل"><input id="sphone" placeholder="هاتف"><input id="saddress" placeholder="عنوان"><input id="snote" placeholder="ملاحظة"><button id="shopsSaveBtn" type="button" onclick="addRecord('shopsData')">حفظ</button><div id="shopsView"></div></div></div>
+<div id="shops" class="page"><div class="card"><h3 id="shopsTitle">إضافة محل</h3><input id="scode" placeholder="كود المحل"><input id="sname" placeholder="اسم المحل"><input id="sphone" placeholder="هاتف"><input id="saddress" placeholder="عنوان"><input id="snote" placeholder="ملاحظة"><button id="shopsSaveBtn" type="button" onclick="addRecord('shopsData')">حفظ</button> <button id="shopsExportBtn" type="button" onclick="exportData('efa_shops.json','shopsData')">تصدير</button> <button id="shopsImportBtn" type="button" onclick="importData('shopsData')">استيراد</button><input id="shopSearch" oninput="load()" placeholder="بحث"><div id="shopsView"></div></div></div>
 
-<div id="factories" class="page"><div class="card"><h3 id="factoriesTitle">إضافة معمل</h3><input id="fname" placeholder="اسم المعمل"><input id="fphone" placeholder="هاتف"><input id="faddress" placeholder="عنوان"><input id="fnote" placeholder="ملاحظة"><button id="factoriesSaveBtn" type="button" onclick="addRecord('factoriesData')">حفظ</button><div id="factoriesView"></div></div></div>
+<div id="factories" class="page"><div class="card"><h3 id="factoriesTitle">إضافة معمل</h3><input id="fcode" placeholder="كود المعمل"><input id="fname" placeholder="اسم المعمل"><input id="fphone" placeholder="هاتف"><input id="faddress" placeholder="عنوان"><input id="fnote" placeholder="ملاحظة"><button id="factoriesSaveBtn" type="button" onclick="addRecord('factoriesData')">حفظ</button> <button id="factoriesExportBtn" type="button" onclick="exportData('efa_factories.json','factoriesData')">تصدير</button> <button id="factoriesImportBtn" type="button" onclick="importData('factoriesData')">استيراد</button><input id="factSearch" oninput="load()" placeholder="بحث"><div id="factoriesView"></div></div></div>
+
+<div id="inventory" class="page"><div class="card"><h3 id="inventoryTitle">المخزون</h3><input id="pcode" placeholder="رمز المنتج"><input id="pname" placeholder="اسم المنتج"><input id="pcolor" placeholder="اللون"><input id="pprice" type="number" min="0" step="any" placeholder="سعر البيع"><input id="popening" type="number" min="0" step="any" placeholder="رصيد افتتاحي"><input id="preorder" type="number" min="0" step="any" placeholder="حد إعادة الطلب"><button id="productsSaveBtn" type="button" onclick="addRecord('productsData')">حفظ</button> <button id="productsExportBtn" type="button" onclick="exportData('efa_products.json','productsData')">تصدير</button> <button id="productsImportBtn" type="button" onclick="importData('productsData')">استيراد</button><input id="prodSearch" oninput="load()" placeholder="بحث"><div id="productsView"></div></div></div>
 
 <div id="invoices" class="page">
 <div class="card">
-<h3 id="invoicesTitle">الفروع</h3>
+<h3 id="invoicesTitle">الإيصالات</h3>
 <select id="invbranch">
   <option value="MERKEZ">MERKEZ</option>
   <option value="DEP0">DEP0</option>
@@ -65,16 +69,19 @@ th,td{border:1px solid #ccc;padding:6px}
   <div class="item-row">
     <input class="invoice-product" placeholder="اسم المنتج">
     <input class="invoice-color" placeholder="اللون">
-    <input class="invoice-qty" placeholder="العدد">
-    <input class="invoice-price" placeholder="السعر">
+    <input class="invoice-qty" type="number" min="0" step="any" placeholder="العدد">
+    <input class="invoice-price" type="number" min="0" step="any" placeholder="السعر">
     <button type="button" class="item-delete-btn" onclick="removeInvoiceItem(this)">×</button>
   </div>
 </div>
 <button id="addInvoiceItemBtn" type="button" onclick="addInvoiceItem()">+ إضافة منتج</button>
 <button id="invoiceSaveBtn" type="button" onclick="saveInvoice()">حفظ الإيصال</button>
 <button id="invoiceExportBtn" type="button" onclick="exportData('efa_invoices.json','efaInvoices')">تصدير الإيصالات</button>
-<div id="invoiceView"></div>
+<button id="invoiceImportBtn" type="button" onclick="importData('efaInvoices')">استيراد الإيصالات</button>
+<input id="invSearch" oninput="load()" placeholder="بحث"><div id="invoiceView"></div>
 </div></div>
+
+<div id="reports" class="page"><div class="card"><h3 id="reportsTitle">التقارير</h3><div id="reportsView"></div></div></div>
 
 <div id="accounts" class="page">
 <div class="card">
@@ -84,24 +91,84 @@ th,td{border:1px solid #ccc;padding:6px}
   <select id="accinv"><option value="" id="accInvPlaceholderOption">رقم الإيصال</option></select>
   <input type="date" id="accdate">
   <select id="currency"><option value="USD" id="currencyOpt1">دولار</option><option value="TRY" id="currencyOpt2">ليرة تركية</option><option value="CHK" id="currencyOpt3">شيك</option></select>
-  <input id="amount" placeholder="المبلغ">
+  <input id="amount" type="number" min="0" step="any" placeholder="المبلغ">
   <div id="checkFields" style="display:none">
     <input type="date" id="checkDate" placeholder="تاريخ الشيك">
     <input type="date" id="finalDate" placeholder="تاريخ آخر سداد">
   </div>
   <button id="accountSaveBtn" type="button" onclick="saveAccount()">حفظ</button>
 <button id="accountExportBtn" type="button" onclick="exportData('efa_accounts.json','efaAccounts')">تصدير الحسابات</button>
-<div id="accountView"></div>
+<button id="accountImportBtn" type="button" onclick="importData('efaAccounts')">استيراد الحسابات</button>
+<input id="accSearch" oninput="load()" placeholder="بحث"><div id="accountView"></div>
 </div></div>
 
 <script>
+function escapeHtml(value){
+ return String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function toNum(value){const n=parseFloat(value);return isFinite(n)?n:0;}
+function getInvoiceItems(i){return Array.isArray(i.items)&&i.items.length?i.items:[{product:i.product||'',color:i.color||'',qty:i.qty||'',price:i.price||''}];}
+function lineTotal(it){return toNum(it.qty)*toNum(it.price);}
+function invoiceTotal(i){return getInvoiceItems(i).reduce((s,it)=>s+lineTotal(it),0);}
+function invoiceByNo(no){return JSON.parse(localStorage.getItem('efaInvoices')||'[]').find(i=>i.no===no)||null;}
+function invoicePaid(no){return JSON.parse(localStorage.getItem('efaAccounts')||'[]').filter(a=>a.invoice===no).reduce((s,a)=>s+toNum(a.amount),0);}
+function invoiceRemaining(no){const inv=invoiceByNo(no);return inv?invoiceTotal(inv)-invoicePaid(no):0;}
+function searchValue(id){const el=document.getElementById(id);return el?el.value.trim().toLowerCase():'';}
+function matchesQuery(obj,q){if(!q) return true;return Object.values(obj).some(v=>typeof v==='string'&&v.toLowerCase().includes(q));}
+function invoiceMatches(i,q){if(!q) return true;return [i.no,i.date,i.branch].concat(getInvoiceItems(i).map(it=>`${it.product||''} ${it.color||''}`)).join(' ').toLowerCase().includes(q);}
+function accountMatches(a,q){if(!q) return true;return [a.type,a.entityCode,a.entityName,a.invoice,a.date,a.amount,a.currency].join(' ').toLowerCase().includes(q);}
+function productSold(name){
+ const key=String(name||'').trim().toLowerCase();
+ if(!key) return 0;
+ let sold=0;
+ JSON.parse(localStorage.getItem('efaInvoices')||'[]').forEach(inv=>getInvoiceItems(inv).forEach(it=>{ if(String(it.product||'').trim().toLowerCase()===key) sold+=toNum(it.qty); }));
+ return sold;
+}
+function productOnHand(p){return toNum(p.opening)-productSold(p.name);}
+function lowStockProducts(){return JSON.parse(localStorage.getItem('productsData')||'[]').filter(p=>productOnHand(p)<=toNum(p.reorder));}
+function renderReports(){
+ const view=document.getElementById('reportsView');
+ if(!view) return;
+ const t=translations[currentLang]||translations.ar;
+ const invoices=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
+ const accounts=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
+ const totalSales=invoices.reduce((s,i)=>s+invoiceTotal(i),0);
+ const totalPaid=accounts.reduce((s,a)=>s+toNum(a.amount),0);
+ const byBranch={};
+ invoices.forEach(i=>{const b=i.branch||'-'; byBranch[b]=(byBranch[b]||0)+invoiceTotal(i);});
+ let salesHtml='<h4>'+t.salesReportTitle+'</h4><table><tr><th>'+t.reportMetric+'</th><th>'+t.reportValue+'</th></tr>'+
+   `<tr><td>${t.reportInvoiceCount}</td><td>${invoices.length}</td></tr>`+
+   `<tr><td>${t.reportTotalSales}</td><td>${totalSales.toFixed(2)}</td></tr>`+
+   `<tr><td>${t.reportTotalPaid}</td><td>${totalPaid.toFixed(2)}</td></tr>`+
+   `<tr><td>${t.reportOutstanding}</td><td>${(totalSales-totalPaid).toFixed(2)}</td></tr>`+
+   Object.keys(byBranch).map(b=>`<tr><td>${escapeHtml(b)}</td><td>${byBranch[b].toFixed(2)}</td></tr>`).join('')+'</table>';
+ const map={};
+ accounts.forEach(a=>{
+  const key=`${a.type}|${a.entityCode||''}|${a.entityName||''}`;
+  if(!map[key]) map[key]={type:a.type,code:a.entityCode||'',name:a.entityName||'',invoices:{},paid:0};
+  map[key].paid+=toNum(a.amount);
+  if(a.invoice) map[key].invoices[a.invoice]=true;
+ });
+ const entityRows=Object.values(map).map(e=>{
+  const invoiced=Object.keys(e.invoices).reduce((s,no)=>{const inv=invoiceByNo(no);return s+(inv?invoiceTotal(inv):0);},0);
+  return {...e,invoiced,remaining:invoiced-e.paid};
+ });
+ let balHtml='<h4>'+t.balancesReportTitle+'</h4>'+(entityRows.length?'<table><tr><th>'+t.accTypeHeader+'</th><th>'+t.accEntityHeader+'</th><th>'+t.reportInvoiced+'</th><th>'+t.invoicePaidHeader+'</th><th>'+t.invoiceRemainingHeader+'</th></tr>'+
+   entityRows.map(e=>`<tr><td>${escapeHtml(e.type)}</td><td>${escapeHtml(e.code?e.code+' - '+e.name:e.name)}</td><td>${e.invoiced.toFixed(2)}</td><td>${e.paid.toFixed(2)}</td><td>${e.remaining.toFixed(2)}</td></tr>`).join('')+'</table>':'<div>'+t.noData+'</div>');
+ const today=new Date().toISOString().slice(0,10);
+ const cheques=accounts.filter(a=>a.currency==='CHK').slice().sort((a,b)=>String(a.finalDate||'').localeCompare(String(b.finalDate||'')));
+ let chkHtml='<h4>'+t.chequeCalendarTitle+'</h4>'+(cheques.length?'<table><tr><th>'+t.accEntityHeader+'</th><th>'+t.accAmountHeader+'</th><th>'+t.checkDateLabel+'</th><th>'+t.finalDateLabel+'</th></tr>'+
+   cheques.map(c=>{const overdue=c.finalDate&&c.finalDate<today;return `<tr style="${overdue?'background:#fdecea':''}"><td>${escapeHtml(c.entityCode?c.entityCode+' - '+(c.entityName||''):(c.entityName||''))}</td><td>${toNum(c.amount).toFixed(2)}</td><td>${escapeHtml(c.checkDate||'')}</td><td>${overdue?'<strong>':''}${escapeHtml(c.finalDate||'')}${overdue?' \u26a0':''}${overdue?'</strong>':''}</td></tr>`;}).join('')+'</table>':'<div>'+t.noData+'</div>');
+ view.innerHTML=salesHtml+'<hr>'+balHtml+'<hr>'+chkHtml;
+}
 function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active'); load();}
 const recordFields={
  customersData:{inputs:['ccode','cname','cphone','caddress','cnote'],props:['code','name','phone','address','note']},
  shopsData:{inputs:['scode','sname','sphone','saddress','snote'],props:['code','name','phone','address','note']},
- factoriesData:{inputs:['fname','fphone','faddress','fnote'],props:['name','phone','address','note']}
+ factoriesData:{inputs:['fcode','fname','fphone','faddress','fnote'],props:['code','name','phone','address','note']},
+ productsData:{inputs:['pcode','pname','pcolor','pprice','popening','preorder'],props:['code','name','color','price','opening','reorder']}
 };
-const editIndexes={customersData:-1,shopsData:-1,factoriesData:-1};
+const editIndexes={customersData:-1,shopsData:-1,factoriesData:-1,productsData:-1};
 let currentInvoiceEditIndex=-1;
 let currentAccountEditIndex=-1;
 function addInvoiceItem(product='', color='', qty='', price=''){
@@ -109,10 +176,10 @@ function addInvoiceItem(product='', color='', qty='', price=''){
  const row=document.createElement('div');
  const t=translations[currentLang]||translations.ar;
  row.className='item-row';
- row.innerHTML=`<input class="invoice-product" placeholder="${t.invProductPlaceholder}" value="${product||''}">`+
-               `<input class="invoice-color" placeholder="${t.invColorPlaceholder}" value="${color||''}">`+
-               `<input class="invoice-qty" placeholder="${t.invQtyPlaceholder}" value="${qty||''}">`+
-               `<input class="invoice-price" placeholder="${t.invPricePlaceholder}" value="${price||''}">`+
+ row.innerHTML=`<input class="invoice-product" placeholder="${t.invProductPlaceholder}" value="${escapeHtml(product)}">`+
+               `<input class="invoice-color" placeholder="${t.invColorPlaceholder}" value="${escapeHtml(color)}">`+
+               `<input class="invoice-qty" type="number" min="0" step="any" placeholder="${t.invQtyPlaceholder}" value="${escapeHtml(qty)}">`+
+               `<input class="invoice-price" type="number" min="0" step="any" placeholder="${t.invPricePlaceholder}" value="${escapeHtml(price)}">`+
                `<button type="button" class="item-delete-btn" onclick="removeInvoiceItem(this)">×</button>`;
  container.appendChild(row);
 }
@@ -134,9 +201,18 @@ function removeInvoiceItem(button){
 function addRecord(key){
  const def=recordFields[key];
  if(!def) return;
+ const t=translations[currentLang]||translations.ar;
  const values=def.inputs.map(id=>document.getElementById(id).value.trim());
  if(!values[0]) return;
  const data=JSON.parse(localStorage.getItem(key)||'[]');
+ const codeIdx=def.props.indexOf('code');
+ if(codeIdx>=0){
+  const codeVal=(values[codeIdx]||'').toLowerCase();
+  if(codeVal && data.some((rec,idx)=> idx!==editIndexes[key] && String(rec.code||'').trim().toLowerCase()===codeVal)){
+   alert(t.duplicateCode);
+   return;
+  }
+ }
  const record=def.props.reduce((acc,p,i)=>{acc[p]=values[i];return acc;},{});
  if(editIndexes[key]>=0){
  data[editIndexes[key]]=record;
@@ -176,7 +252,12 @@ function saveInvoice(){
  return;
  }
  if(items.some(item=>item.product && (!item.qty || !item.price))){
- const messages={ar:'Her ürün için adet ve fiyat giriniz.',tr:'Her ürün için adet ve fiyat giriniz.'};
+ const messages={ar:'يرجى إدخال العدد والسعر لكل منتج.',tr:'Her ürün için adet ve fiyat giriniz.'};
+ alert(messages[currentLang]||messages.ar);
+ return;
+ }
+ if(items.some(item=>toNum(item.qty)<=0 || toNum(item.price)<0)){
+ const messages={ar:'العدد والسعر يجب أن يكونا أرقاماً صالحة.',tr:'Adet ve fiyat geçerli sayı olmalıdır.'};
  alert(messages[currentLang]||messages.ar);
  return;
  }
@@ -245,6 +326,11 @@ function saveAccount(){
  alert(messages[currentLang]||messages.ar);
  return;
  }
+ if(toNum(amount)<=0){
+ const messages={ar:'المبلغ يجب أن يكون رقماً صالحاً.',tr:'Tutar geçerli bir sayı olmalıdır.'};
+ alert(messages[currentLang]||messages.ar);
+ return;
+ }
  const data=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
  if(currentAccountEditIndex>=0){
  data[currentAccountEditIndex]={type,entityCode,entityName,invoice,date,currency,amount,checkDate:document.getElementById('checkDate').value||'',finalDate:document.getElementById('finalDate').value||''};
@@ -293,7 +379,6 @@ function populateInvoiceSelect(currentInvoice){
  const select=document.getElementById('accinv');
  const invoices=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
  const accounts=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
- const used=accounts.map(a=>a.invoice);
  const t=translations[currentLang]||translations.ar;
  select.innerHTML='';
  const placeholder=document.createElement('option');
@@ -305,10 +390,9 @@ function populateInvoiceSelect(currentInvoice){
  let currentInvoiceAdded=false;
  invoices.forEach(item=>{
  if(!item.no) return;
- if(used.includes(item.no) && item.no!==currentInvoice) return;
  const option=document.createElement('option');
  option.value=item.no;
- option.textContent=`${item.no}${item.date?` (${item.date})`:''}`;
+ option.textContent=`${item.no}${item.date?` (${item.date})`:''} — ${t.remainingLabel}: ${invoiceRemaining(item.no).toFixed(2)}`;
  if(item.no===currentInvoice) currentInvoiceAdded=true;
  select.appendChild(option);
  });
@@ -383,9 +467,64 @@ function exportData(file,key){
  a.download=file;
  a.click();
 }
+const ALL_DATA_KEYS=['customersData','shopsData','factoriesData','productsData','efaInvoices','efaAccounts'];
+function downloadJson(file,obj){
+ const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download=file;
+ a.click();
+}
+function pickJsonFile(onParsed){
+ const t=translations[currentLang]||translations.ar;
+ const input=document.createElement('input');
+ input.type='file';
+ input.accept='application/json,.json';
+ input.onchange=()=>{
+  const file=input.files&&input.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+   try{ onParsed(JSON.parse(reader.result)); }
+   catch(e){ alert(t.importError); }
+  };
+  reader.readAsText(file);
+ };
+ input.click();
+}
+function importData(key){
+ const t=translations[currentLang]||translations.ar;
+ pickJsonFile(parsed=>{
+  if(!Array.isArray(parsed)){ alert(t.importError); return; }
+  if(!confirm(t.importConfirm)) return;
+  localStorage.setItem(key,JSON.stringify(parsed));
+  load();
+  alert(t.importDone);
+ });
+}
+function backupAll(){
+ const dump={};
+ ALL_DATA_KEYS.forEach(k=>{ dump[k]=JSON.parse(localStorage.getItem(k)||'[]'); });
+ downloadJson('efa_backup.json',dump);
+}
+function restoreAll(){
+ const t=translations[currentLang]||translations.ar;
+ pickJsonFile(parsed=>{
+  if(!parsed||typeof parsed!=='object'||Array.isArray(parsed)){ alert(t.importError); return; }
+  if(!confirm(t.restoreConfirm)) return;
+  ALL_DATA_KEYS.forEach(k=>{ if(Array.isArray(parsed[k])) localStorage.setItem(k,JSON.stringify(parsed[k])); });
+  load();
+  alert(t.importDone);
+ });
+}
+function confirmDelete(){
+ const t=translations[currentLang]||translations.ar;
+ return confirm(t.confirmDelete);
+}
 function deleteSimple(key,index){
  const data=JSON.parse(localStorage.getItem(key)||'[]');
  if(index<0||index>=data.length) return;
+ if(!confirmDelete()) return;
  data.splice(index,1);
  localStorage.setItem(key,JSON.stringify(data));
  load();
@@ -393,6 +532,7 @@ function deleteSimple(key,index){
 function deleteInvoice(index){
  const data=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
  if(index<0||index>=data.length) return;
+ if(!confirmDelete()) return;
  data.splice(index,1);
  if(currentInvoiceEditIndex===index){
  currentInvoiceEditIndex=-1;
@@ -407,6 +547,7 @@ function deleteInvoice(index){
 function deleteAccount(index){
  const data=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
  if(index<0||index>=data.length) return;
+ if(!confirmDelete()) return;
  data.splice(index,1);
  if(currentAccountEditIndex===index){
  currentAccountEditIndex=-1;
@@ -433,7 +574,9 @@ const translations={
  shopsPlaceholder:'اسم المحل',
  factoriesTitle:'إضافة معمل',
  factoriesSave:'حفظ',
+ factoriesCodePlaceholder:'كود المعمل',
  factoriesPlaceholder:'اسم المعمل',
+ duplicateCode:'الكود مستخدم بالفعل. يرجى استخدام كود آخر.',
  factoriesPhonePlaceholder:'هاتف',
  factoriesAddressPlaceholder:'العنوان',
  factoriesNotePlaceholder:'ملاحظة',
@@ -443,7 +586,7 @@ const translations={
  shopsPhonePlaceholder:'هاتف',
  shopsAddressPlaceholder:'عنوان',
  shopsNotePlaceholder:'ملاحظة',
- invoicesTitle:'الفروع',
+ invoicesTitle:'الإيصالات',
  invoiceSave:'حفظ الإيصال',
  invoiceExport:'تصدير الإيصالات',
  invNoPlaceholder:'رقم الإيصال',
@@ -458,6 +601,10 @@ const translations={
  invoiceQtyHeader:'عدد',
  invoiceColorHeader:'اللون',
  invoicePriceHeader:'السعر',
+ invoiceTotalHeader:'الإجمالي',
+ invoicePaidHeader:'المدفوع',
+ invoiceRemainingHeader:'المتبقي',
+ remainingLabel:'المتبقي',
  noInvoices:'لا توجد إيصالات',
  addInvoiceItemBtn:'+ إضافة منتج',
  noAccounts:'لا توجد حسابات',
@@ -485,14 +632,55 @@ const translations={
  navCustomers:'الزبائن',
  navShops:'المحلات',
  navFactories:'المعامل',
- navInvoices:'الفروع',
+ navInvoices:'الإيصالات',
  navAccounts:'الحسابات',
  currencyDollar:'دولار',
  currencyTry:'ليرة تركية',
  deleteBtn:'حذف',
  editBtn:'تعديل',
  deleteHeader:'حذف',
- editHeader:'تعديل'
+ editHeader:'تعديل',
+ confirmDelete:'هل أنت متأكد من الحذف؟',
+ exportBtn:'تصدير',
+ importBtn:'استيراد',
+ backupAllBtn:'نسخ احتياطي شامل',
+ restoreAllBtn:'استعادة شاملة',
+ importError:'ملف غير صالح.',
+ importConfirm:'سيتم استبدال البيانات الحالية. متابعة؟',
+ restoreConfirm:'سيتم استبدال كل البيانات. متابعة؟',
+ importDone:'تمت الاستعادة بنجاح.',
+ searchPlaceholder:'بحث',
+ inventoryTitle:'المخزون',
+ navInventory:'المخزون',
+ productsSave:'حفظ',
+ prodCodePlaceholder:'رمز المنتج',
+ prodNamePlaceholder:'اسم المنتج',
+ prodColorPlaceholder:'اللون',
+ prodPricePlaceholder:'سعر البيع',
+ prodOpeningPlaceholder:'رصيد افتتاحي',
+ prodReorderPlaceholder:'حد إعادة الطلب',
+ prodCodeHeader:'الرمز',
+ prodNameHeader:'الاسم',
+ prodColorHeader:'اللون',
+ prodPriceHeader:'السعر',
+ prodReorderHeader:'حد الطلب',
+ prodSoldHeader:'المباع',
+ prodOnHandHeader:'المتوفر',
+ noProducts:'لا توجد منتجات',
+ lowStockTitle:'تنبيهات نفاد المخزون',
+ navReports:'التقارير',
+ reportsTitle:'التقارير',
+ salesReportTitle:'ملخص المبيعات',
+ balancesReportTitle:'أرصدة الكيانات',
+ chequeCalendarTitle:'تقويم الشيكات',
+ reportMetric:'البيان',
+ reportValue:'القيمة',
+ reportInvoiceCount:'عدد الإيصالات',
+ reportTotalSales:'إجمالي المبيعات',
+ reportTotalPaid:'إجمالي المدفوع',
+ reportOutstanding:'المتبقي',
+ reportInvoiced:'المفوتر',
+ noData:'لا توجد بيانات'
  },
  tr:{
  headerSubtitle:'Müşteri, mağaza, fabrika, fiş ve hesap yönetimi',
@@ -514,7 +702,9 @@ const translations={
  shopsNotePlaceholder:'Not',
  factoriesTitle:'Fabrika Ekle',
  factoriesSave:'Kaydet',
+ factoriesCodePlaceholder:'Fabrika Kodu',
  factoriesPlaceholder:'Fabrika Adı',
+ duplicateCode:'Bu kod zaten kullanılıyor. Lütfen başka bir kod kullanın.',
  factoriesPhonePlaceholder:'Telefon',
  factoriesAddressPlaceholder:'Adres',
  factoriesNotePlaceholder:'Not',
@@ -524,7 +714,7 @@ const translations={
  shopsPhonePlaceholder:'Telefon',
  shopsAddressPlaceholder:'Adres',
  shopsNotePlaceholder:'Not',
- invoicesTitle:'Şubeler',
+ invoicesTitle:'Fişler',
  invoiceSave:'Fişi Kaydet',
  invoiceExport:'Fişleri Dışa Aktar',
  invNoPlaceholder:'Fiş Numarası',
@@ -540,6 +730,10 @@ const translations={
  invoiceQtyHeader:'Adet',
  invoiceColorHeader:'Renk',
  invoicePriceHeader:'Fiyat',
+ invoiceTotalHeader:'Toplam',
+ invoicePaidHeader:'Ödenen',
+ invoiceRemainingHeader:'Kalan',
+ remainingLabel:'Kalan',
  noInvoices:'Fiş yok',
  noAccounts:'Hesap yok',
  accInvTableHeader:'Fiş Numarası',
@@ -566,14 +760,55 @@ const translations={
  navCustomers:'Müşteriler',
  navShops:'Mağazalar',
  navFactories:'Fabrikalar',
- navInvoices:'Şubeler',
+ navInvoices:'Fişler',
  navAccounts:'Hesaplar',
  currencyDollar:'Dolar',
  currencyTry:'Türk Lirası',
  deleteBtn:'Sil',
  editBtn:'Düzenle',
  deleteHeader:'Sil',
- editHeader:'Düzenle'
+ editHeader:'Düzenle',
+ confirmDelete:'Silmek istediğinize emin misiniz?',
+ exportBtn:'Dışa aktar',
+ importBtn:'İçe aktar',
+ backupAllBtn:'Tümünü yedekle',
+ restoreAllBtn:'Tümünü geri yükle',
+ importError:'Geçersiz dosya.',
+ importConfirm:'Mevcut veriler değiştirilecek. Devam edilsin mi?',
+ restoreConfirm:'Tüm veriler değiştirilecek. Devam edilsin mi?',
+ importDone:'Başarıyla geri yüklendi.',
+ searchPlaceholder:'Ara',
+ inventoryTitle:'Stok',
+ navInventory:'Stok',
+ productsSave:'Kaydet',
+ prodCodePlaceholder:'Ürün Kodu',
+ prodNamePlaceholder:'Ürün Adı',
+ prodColorPlaceholder:'Renk',
+ prodPricePlaceholder:'Satış Fiyatı',
+ prodOpeningPlaceholder:'Açılış Stoğu',
+ prodReorderPlaceholder:'Yeniden Sipariş Seviyesi',
+ prodCodeHeader:'Kod',
+ prodNameHeader:'Ad',
+ prodColorHeader:'Renk',
+ prodPriceHeader:'Fiyat',
+ prodReorderHeader:'Sipariş Seviyesi',
+ prodSoldHeader:'Satılan',
+ prodOnHandHeader:'Mevcut',
+ noProducts:'Ürün yok',
+ lowStockTitle:'Düşük Stok Uyarıları',
+ navReports:'Raporlar',
+ reportsTitle:'Raporlar',
+ salesReportTitle:'Satış Özeti',
+ balancesReportTitle:'Bakiyeler',
+ chequeCalendarTitle:'Çek Takvimi',
+ reportMetric:'Metrik',
+ reportValue:'Değer',
+ reportInvoiceCount:'Fiş Sayısı',
+ reportTotalSales:'Toplam Satış',
+ reportTotalPaid:'Toplam Ödeme',
+ reportOutstanding:'Kalan',
+ reportInvoiced:'Faturalanan',
+ noData:'Veri yok'
  }
 };
 let currentLang='ar';
@@ -585,17 +820,27 @@ function load(){
  const invoiceView=document.getElementById('invoiceView');
  const accountView=document.getElementById('accountView');
  const customers=JSON.parse(localStorage.getItem('customersData')||'[]');
- customersView.innerHTML=customers.map((item,index)=>`<div><strong>${item.code}</strong> - ${item.name}<br>${item.phone}<br>${item.address}<br>${item.note}<br><button class="delete-btn" type="button" onclick="editRecord('customersData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('customersData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
+ const custQ=searchValue('custSearch');
+ customersView.innerHTML=customers.map((item,index)=>({item,index})).filter(({item})=>matchesQuery(item,custQ)).map(({item,index})=>`<div><strong>${escapeHtml(item.code)}</strong> - ${escapeHtml(item.name)}<br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('customersData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('customersData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
  const shops=JSON.parse(localStorage.getItem('shopsData')||'[]');
- shopsView.innerHTML=shops.map((item,index)=>`<div><strong>${item.code}</strong> - ${item.name}<br>${item.phone}<br>${item.address}<br>${item.note}<br><button class="delete-btn" type="button" onclick="editRecord('shopsData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('shopsData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
+ const shopQ=searchValue('shopSearch');
+ shopsView.innerHTML=shops.map((item,index)=>({item,index})).filter(({item})=>matchesQuery(item,shopQ)).map(({item,index})=>`<div><strong>${escapeHtml(item.code)}</strong> - ${escapeHtml(item.name)}<br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('shopsData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('shopsData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
  const factories=JSON.parse(localStorage.getItem('factoriesData')||'[]');
- factoriesView.innerHTML=factories.map((item,index)=>`<div><strong>${item.name}</strong><br>${item.phone}<br>${item.address}<br>${item.note}<br><button class="delete-btn" type="button" onclick="editRecord('factoriesData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('factoriesData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
+ const factQ=searchValue('factSearch');
+ factoriesView.innerHTML=factories.map((item,index)=>({item,index})).filter(({item})=>matchesQuery(item,factQ)).map(({item,index})=>`<div><strong>${escapeHtml(item.code||'')}</strong>${item.code?' - ':''}${escapeHtml(item.name)}<br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('factoriesData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('factoriesData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
+ const productsView=document.getElementById('productsView');
+ if(productsView){
+  const products=JSON.parse(localStorage.getItem('productsData')||'[]');
+  const prodQ=searchValue('prodSearch');
+  const rows=products.map((item,index)=>({item,index})).filter(({item})=>matchesQuery(item,prodQ));
+  productsView.innerHTML=rows.length?'<table><tr><th>'+t.prodCodeHeader+'</th><th>'+t.prodNameHeader+'</th><th>'+t.prodColorHeader+'</th><th>'+t.prodPriceHeader+'</th><th>'+t.prodReorderHeader+'</th><th>'+t.prodSoldHeader+'</th><th>'+t.prodOnHandHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+rows.map(({item,index})=>{const onHand=productOnHand(item);const low=onHand<=toNum(item.reorder);return `<tr style="${low?'background:#fdecea':''}"><td>${escapeHtml(item.code||'')}</td><td>${escapeHtml(item.name||'')}</td><td>${escapeHtml(item.color||'')}</td><td>${toNum(item.price).toFixed(2)}</td><td>${escapeHtml(item.reorder||'')}</td><td>${productSold(item.name).toFixed(2)}</td><td>${low?'<strong>':''}${onHand.toFixed(2)}${low?'</strong>':''}</td><td><button class="delete-btn" type="button" onclick="editRecord('productsData',${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteSimple('productsData',${index})">${t.deleteBtn}</button></td></tr>`;}).join('')+'</table>':'<div>'+t.noProducts+'</div>';
+ }
  const inv=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
- const invoiceTable = inv.length ? '<table><tr><th>'+t.invoiceNoHeader+'</th><th>'+t.invoiceDateHeader+'</th><th>'+t.invoiceBranchHeader+'</th><th>'+t.invoiceProductHeader+'</th><th>'+t.invoiceQtyHeader+'</th><th>'+t.invoiceColorHeader+'</th><th>'+t.invoicePriceHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+inv.map((i,index)=>`<tr><td>${i.no}</td><td>${i.date}</td><td>${i.branch||''}</td><td>${Array.isArray(i.items)?i.items.map(it=>it.product||'').join('<br>'):i.product||''}</td><td>${Array.isArray(i.items)?i.items.map(it=>it.qty||'').join('<br>'):i.qty||''}</td><td>${Array.isArray(i.items)?i.items.map(it=>it.color||'').join('<br>'):i.color||''}</td><td>${Array.isArray(i.items)?i.items.map(it=>it.price||'').join('<br>'):i.price||''}</td><td><button class="delete-btn" type="button" onclick="editInvoice(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteInvoice(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>' : '<div>'+t.noInvoices+'</div>';
+ const invoiceTable = inv.length ? '<table><tr><th>'+t.invoiceNoHeader+'</th><th>'+t.invoiceDateHeader+'</th><th>'+t.invoiceBranchHeader+'</th><th>'+t.invoiceProductHeader+'</th><th>'+t.invoiceQtyHeader+'</th><th>'+t.invoiceColorHeader+'</th><th>'+t.invoicePriceHeader+'</th><th>'+t.invoiceTotalHeader+'</th><th>'+t.invoicePaidHeader+'</th><th>'+t.invoiceRemainingHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+inv.map((i,index)=>({i,index})).filter(({i})=>invoiceMatches(i,searchValue('invSearch'))).map(({i,index})=>`<tr><td>${escapeHtml(i.no)}</td><td>${escapeHtml(i.date)}</td><td>${escapeHtml(i.branch||'')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.product||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.qty||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.color||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.price||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>lineTotal(it).toFixed(2)).join('<br>')}<br><strong>${invoiceTotal(i).toFixed(2)}</strong></td><td>${invoicePaid(i.no).toFixed(2)}</td><td>${invoiceRemaining(i.no).toFixed(2)}</td><td><button class="delete-btn" type="button" onclick="editInvoice(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteInvoice(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>' : '<div>'+t.noInvoices+'</div>';
  invoiceView.innerHTML=invoiceTable;
  const acc=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
  if(acc.length){
- accountView.innerHTML='<table><tr><th>'+t.accTypeHeader+'</th><th>'+t.accEntityHeader+'</th><th>'+t.accInvTableHeader+'</th><th>'+t.accountDateHeader+'</th><th>'+t.accAmountHeader+'</th><th>'+t.accountCurrencyHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+acc.map((a,index)=>`<tr><td>${a.type}</td><td>${a.entityCode?`${a.entityCode} - ${a.entityName||''}`:''}<br></td><td>${a.invoice}</td><td>${a.date||''}${a.checkDate?`<br>${t.checkDateLabel}: ${a.checkDate}`:''}${a.finalDate?`<br>${t.finalDateLabel}: ${a.finalDate}`:''}</td><td>${a.amount}</td><td>${a.currency}</td><td><button class="delete-btn" type="button" onclick="editAccount(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteAccount(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>';
+ accountView.innerHTML='<table><tr><th>'+t.accTypeHeader+'</th><th>'+t.accEntityHeader+'</th><th>'+t.accInvTableHeader+'</th><th>'+t.accountDateHeader+'</th><th>'+t.accAmountHeader+'</th><th>'+t.accountCurrencyHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+acc.map((a,index)=>({a,index})).filter(({a})=>accountMatches(a,searchValue('accSearch'))).map(({a,index})=>`<tr><td>${escapeHtml(a.type)}</td><td>${a.entityCode?`${escapeHtml(a.entityCode)} - ${escapeHtml(a.entityName||'')}`:''}<br></td><td>${escapeHtml(a.invoice)}</td><td>${escapeHtml(a.date||'')}${a.checkDate?`<br>${t.checkDateLabel}: ${escapeHtml(a.checkDate)}`:''}${a.finalDate?`<br>${t.finalDateLabel}: ${escapeHtml(a.finalDate)}`:''}</td><td>${escapeHtml(a.amount)}</td><td>${escapeHtml(a.currency)}</td><td><button class="delete-btn" type="button" onclick="editAccount(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteAccount(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>';
  } else {
  accountView.innerHTML='<div>'+t.noAccounts+'</div>';
  }
@@ -605,7 +850,7 @@ try{
  const dashboard=document.getElementById('dashboard');
  const checks=acc.filter(a=>a.currency==='CHK'&&a.finalDate);
  if(checks.length){
-   const list=checks.map(c=>`<div><strong>${c.entityCode||c.entityName}</strong> ${c.amount} ${c.currency}<br>${t.checkDateLabel}: ${c.checkDate||''} <br>${t.finalDateLabel}: ${c.finalDate||''}</div>`).join('<hr>');
+   const list=checks.map(c=>`<div><strong>${escapeHtml(c.entityCode||c.entityName)}</strong> ${escapeHtml(c.amount)} ${escapeHtml(c.currency)}<br>${t.checkDateLabel}: ${escapeHtml(c.checkDate||'')} <br>${t.finalDateLabel}: ${escapeHtml(c.finalDate||'')}</div>`).join('<hr>');
    let upcoming=document.getElementById('upcomingChecks');
    if(!upcoming){
      upcoming=document.createElement('div'); upcoming.id='upcomingChecks';
@@ -616,6 +861,18 @@ try{
    const uc=document.getElementById('upcomingChecks'); if(uc) uc.innerHTML='';
  }
 }catch(e){}
+// dashboard: low stock alerts
+try{
+ const dashboard=document.getElementById('dashboard');
+ const low=lowStockProducts();
+ let lowBox=document.getElementById('lowStockAlerts');
+ if(low.length){
+   const list=low.map(p=>`<div><strong>${escapeHtml(p.code||p.name)}</strong> ${escapeHtml(p.name||'')} \u2014 ${t.prodOnHandHeader}: ${productOnHand(p).toFixed(2)} (${t.prodReorderHeader}: ${escapeHtml(p.reorder||'')})</div>`).join('<hr>');
+   if(!lowBox){ lowBox=document.createElement('div'); lowBox.id='lowStockAlerts'; dashboard.querySelector('.card').appendChild(lowBox); }
+   lowBox.innerHTML='<h4>'+t.lowStockTitle+'</h4>'+list;
+ } else if(lowBox){ lowBox.innerHTML=''; }
+}catch(e){}
+ renderReports();
  if(currentInvoiceEditIndex<0) setNextInvoiceNumber();
  populateInvoiceSelect();
 }
@@ -629,6 +886,7 @@ function setLanguage(lang){
  const t=translations[lang]||translations.ar;
  document.documentElement.lang=lang;
  document.documentElement.dir=(lang==='ar'?'rtl':'ltr');
+ const setText=(id,val)=>{const el=document.getElementById(id); if(el) el.textContent=val;};
  document.getElementById('headerSubtitle').textContent=t.headerSubtitle;
  document.getElementById('dashboardTitle').textContent=t.dashboardTitle;
  document.getElementById('dashboardDesc').textContent=t.dashboardDesc;
@@ -648,6 +906,7 @@ function setLanguage(lang){
  document.getElementById('snote').placeholder=t.shopsNotePlaceholder;
  document.getElementById('factoriesTitle').textContent=t.factoriesTitle;
  document.getElementById('factoriesSaveBtn').textContent=t.factoriesSave;
+ document.getElementById('fcode').placeholder=t.factoriesCodePlaceholder;
  document.getElementById('fname').placeholder=t.factoriesPlaceholder;
  document.getElementById('fphone').placeholder=t.factoriesPhonePlaceholder;
  document.getElementById('faddress').placeholder=t.factoriesAddressPlaceholder;
@@ -691,12 +950,28 @@ function setLanguage(lang){
  document.getElementById('customersBtn').textContent=t.navCustomers;
  document.getElementById('shopsBtn').textContent=t.navShops;
  document.getElementById('factoriesBtn').textContent=t.navFactories;
+ setText('inventoryBtn',t.navInventory);
+ setText('inventoryTitle',t.inventoryTitle);
+ setText('productsSaveBtn',t.productsSave);
+ setText('productsExportBtn',t.exportBtn);
+ setText('productsImportBtn',t.importBtn);
+ const setPh=(id,val)=>{const el=document.getElementById(id); if(el) el.placeholder=val;};
+ setPh('pcode',t.prodCodePlaceholder);setPh('pname',t.prodNamePlaceholder);setPh('pcolor',t.prodColorPlaceholder);setPh('pprice',t.prodPricePlaceholder);setPh('popening',t.prodOpeningPlaceholder);setPh('preorder',t.prodReorderPlaceholder);setPh('prodSearch',t.searchPlaceholder);
  document.getElementById('invoicesBtn').textContent=t.navInvoices;
  document.getElementById('accountsBtn').textContent=t.navAccounts;
+ setText('reportsBtn',t.navReports);
+ setText('reportsTitle',t.reportsTitle);
  document.getElementById('currencyOpt1').textContent=t.currencyDollar;
  document.getElementById('currencyOpt2').textContent=t.currencyTry;
  const addInvoiceItemBtn=document.getElementById('addInvoiceItemBtn');
  if(addInvoiceItemBtn) addInvoiceItemBtn.textContent=t.addInvoiceItemBtn;
+ ['customersExportBtn','shopsExportBtn','factoriesExportBtn'].forEach(id=>setText(id,t.exportBtn));
+ ['customersImportBtn','shopsImportBtn','factoriesImportBtn'].forEach(id=>setText(id,t.importBtn));
+ setText('invoiceImportBtn',t.importBtn);
+ setText('accountImportBtn',t.importBtn);
+ setText('backupAllBtn',t.backupAllBtn);
+ setText('restoreAllBtn',t.restoreAllBtn);
+ ['custSearch','shopSearch','factSearch','invSearch','accSearch'].forEach(id=>{const el=document.getElementById(id); if(el) el.placeholder=t.searchPlaceholder;});
  load();
 }
 load();
