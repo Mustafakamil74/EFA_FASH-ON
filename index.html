@@ -50,7 +50,7 @@ th,td{border:1px solid #ccc;padding:6px}
 
 <div id="shops" class="page"><div class="card"><h3 id="shopsTitle">إضافة محل</h3><input id="scode" placeholder="كود المحل"><input id="sname" placeholder="اسم المحل"><input id="sphone" placeholder="هاتف"><input id="saddress" placeholder="عنوان"><input id="snote" placeholder="ملاحظة"><button id="shopsSaveBtn" type="button" onclick="addRecord('shopsData')">حفظ</button> <button id="shopsExportBtn" type="button" onclick="exportData('efa_shops.json','shopsData')">تصدير</button> <button id="shopsImportBtn" type="button" onclick="importData('shopsData')">استيراد</button><div id="shopsView"></div></div></div>
 
-<div id="factories" class="page"><div class="card"><h3 id="factoriesTitle">إضافة معمل</h3><input id="fname" placeholder="اسم المعمل"><input id="fphone" placeholder="هاتف"><input id="faddress" placeholder="عنوان"><input id="fnote" placeholder="ملاحظة"><button id="factoriesSaveBtn" type="button" onclick="addRecord('factoriesData')">حفظ</button> <button id="factoriesExportBtn" type="button" onclick="exportData('efa_factories.json','factoriesData')">تصدير</button> <button id="factoriesImportBtn" type="button" onclick="importData('factoriesData')">استيراد</button><div id="factoriesView"></div></div></div>
+<div id="factories" class="page"><div class="card"><h3 id="factoriesTitle">إضافة معمل</h3><input id="fcode" placeholder="كود المعمل"><input id="fname" placeholder="اسم المعمل"><input id="fphone" placeholder="هاتف"><input id="faddress" placeholder="عنوان"><input id="fnote" placeholder="ملاحظة"><button id="factoriesSaveBtn" type="button" onclick="addRecord('factoriesData')">حفظ</button> <button id="factoriesExportBtn" type="button" onclick="exportData('efa_factories.json','factoriesData')">تصدير</button> <button id="factoriesImportBtn" type="button" onclick="importData('factoriesData')">استيراد</button><div id="factoriesView"></div></div></div>
 
 <div id="invoices" class="page">
 <div class="card">
@@ -108,7 +108,7 @@ function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.remo
 const recordFields={
  customersData:{inputs:['ccode','cname','cphone','caddress','cnote'],props:['code','name','phone','address','note']},
  shopsData:{inputs:['scode','sname','sphone','saddress','snote'],props:['code','name','phone','address','note']},
- factoriesData:{inputs:['fname','fphone','faddress','fnote'],props:['name','phone','address','note']}
+ factoriesData:{inputs:['fcode','fname','fphone','faddress','fnote'],props:['code','name','phone','address','note']}
 };
 const editIndexes={customersData:-1,shopsData:-1,factoriesData:-1};
 let currentInvoiceEditIndex=-1;
@@ -143,9 +143,18 @@ function removeInvoiceItem(button){
 function addRecord(key){
  const def=recordFields[key];
  if(!def) return;
+ const t=translations[currentLang]||translations.ar;
  const values=def.inputs.map(id=>document.getElementById(id).value.trim());
  if(!values[0]) return;
  const data=JSON.parse(localStorage.getItem(key)||'[]');
+ const codeIdx=def.props.indexOf('code');
+ if(codeIdx>=0){
+  const codeVal=(values[codeIdx]||'').toLowerCase();
+  if(codeVal && data.some((rec,idx)=> idx!==editIndexes[key] && String(rec.code||'').trim().toLowerCase()===codeVal)){
+   alert(t.duplicateCode);
+   return;
+  }
+ }
  const record=def.props.reduce((acc,p,i)=>{acc[p]=values[i];return acc;},{});
  if(editIndexes[key]>=0){
  data[editIndexes[key]]=record;
@@ -509,7 +518,9 @@ const translations={
  shopsPlaceholder:'اسم المحل',
  factoriesTitle:'إضافة معمل',
  factoriesSave:'حفظ',
+ factoriesCodePlaceholder:'كود المعمل',
  factoriesPlaceholder:'اسم المعمل',
+ duplicateCode:'الكود مستخدم بالفعل. يرجى استخدام كود آخر.',
  factoriesPhonePlaceholder:'هاتف',
  factoriesAddressPlaceholder:'العنوان',
  factoriesNotePlaceholder:'ملاحظة',
@@ -600,7 +611,9 @@ const translations={
  shopsNotePlaceholder:'Not',
  factoriesTitle:'Fabrika Ekle',
  factoriesSave:'Kaydet',
+ factoriesCodePlaceholder:'Fabrika Kodu',
  factoriesPlaceholder:'Fabrika Adı',
+ duplicateCode:'Bu kod zaten kullanılıyor. Lütfen başka bir kod kullanın.',
  factoriesPhonePlaceholder:'Telefon',
  factoriesAddressPlaceholder:'Adres',
  factoriesNotePlaceholder:'Not',
@@ -685,7 +698,7 @@ function load(){
  const shops=JSON.parse(localStorage.getItem('shopsData')||'[]');
  shopsView.innerHTML=shops.map((item,index)=>`<div><strong>${escapeHtml(item.code)}</strong> - ${escapeHtml(item.name)}<br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('shopsData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('shopsData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
  const factories=JSON.parse(localStorage.getItem('factoriesData')||'[]');
- factoriesView.innerHTML=factories.map((item,index)=>`<div><strong>${escapeHtml(item.name)}</strong><br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('factoriesData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('factoriesData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
+ factoriesView.innerHTML=factories.map((item,index)=>`<div><strong>${escapeHtml(item.code||'')}</strong>${item.code?' - ':''}${escapeHtml(item.name)}<br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('factoriesData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('factoriesData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
  const inv=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
  const invoiceTable = inv.length ? '<table><tr><th>'+t.invoiceNoHeader+'</th><th>'+t.invoiceDateHeader+'</th><th>'+t.invoiceBranchHeader+'</th><th>'+t.invoiceProductHeader+'</th><th>'+t.invoiceQtyHeader+'</th><th>'+t.invoiceColorHeader+'</th><th>'+t.invoicePriceHeader+'</th><th>'+t.invoiceTotalHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+inv.map((i,index)=>`<tr><td>${escapeHtml(i.no)}</td><td>${escapeHtml(i.date)}</td><td>${escapeHtml(i.branch||'')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.product||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.qty||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.color||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.price||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>lineTotal(it).toFixed(2)).join('<br>')}<br><strong>${invoiceTotal(i).toFixed(2)}</strong></td><td><button class="delete-btn" type="button" onclick="editInvoice(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteInvoice(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>' : '<div>'+t.noInvoices+'</div>';
  invoiceView.innerHTML=invoiceTable;
@@ -744,6 +757,7 @@ function setLanguage(lang){
  document.getElementById('snote').placeholder=t.shopsNotePlaceholder;
  document.getElementById('factoriesTitle').textContent=t.factoriesTitle;
  document.getElementById('factoriesSaveBtn').textContent=t.factoriesSave;
+ document.getElementById('fcode').placeholder=t.factoriesCodePlaceholder;
  document.getElementById('fname').placeholder=t.factoriesPlaceholder;
  document.getElementById('fphone').placeholder=t.factoriesPhonePlaceholder;
  document.getElementById('faddress').placeholder=t.factoriesAddressPlaceholder;
