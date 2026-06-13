@@ -21,10 +21,10 @@ python3 -m http.server 8000
 - **Dashboard** – low-stock alerts and upcoming/overdue cheques.
 - **Customers** / **Shops** – contacts with a unique code, phone, address and note.
 - **Factories** – suppliers (with a unique code).
-- **Inventory** – product/SKU master and stock-on-hand per branch.
+- **Inventory** – product/SKU master with stock-on-hand (opening stock minus sold) and low-stock alerts.
 - **Invoices** – multi-line invoices per branch with computed line and invoice totals.
 - **Accounts** – payments against invoices (cash / cheque / transfer), with remaining balance.
-- **Reports** – customer balances & aging, sales summary and a cheque calendar.
+- **Reports** – entity balances (invoiced / paid / remaining), a sales summary and a cheque calendar.
 
 ## Data storage & backup
 
@@ -42,4 +42,4 @@ Clearing the browser's site data will erase everything, so keep backups.
 
 - No dependencies, no toolchain — edit `index.html` directly.
 - User-entered text is HTML-escaped before rendering to avoid injection.
-- Records are addressed by a stable `id`, generated on save.
+- Numeric fields are validated and totals are computed (`qty × price`).
