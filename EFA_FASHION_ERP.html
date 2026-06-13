@@ -1,0 +1,706 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EFA FASHION ERP</title>
+<style>
+body{font-family:Tahoma;margin:0;background:#f4f0e8}
+header{background:#1f1f1f;color:#fff;padding:20px;text-align:center}
+nav{background:#2a2a2a;padding:10px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+button{padding:10px 14px;border:none;border-radius:8px;cursor:pointer}
+button.delete-btn{background:#e74c3c;color:#fff}
+nav button{background:#f4f0e8}
+.page{display:none;padding:20px}
+.active{display:block}
+.card{background:#fff;padding:15px;border-radius:10px;margin:10px 0}
+input,select{width:100%;padding:8px;margin:5px 0}
+.item-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:6px;align-items:center;margin-bottom:8px}
+.item-delete-btn{width:38px;height:38px;border:none;border-radius:50%;background:#e74c3c;color:#fff;font-size:20px;font-weight:bold;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,.18);transition:transform .18s ease, background .18s ease, opacity .18s ease}
+.item-delete-btn:hover{background:#d64541;transform:scale(1.08);opacity:1}
+.item-delete-btn:active{transform:scale(.98)}
+#addInvoiceItemBtn{padding:10px 14px;border:none;border-radius:20px;background:#27ae60;color:#fff;font-weight:bold;cursor:pointer;margin:0 0 10px 0}
+#addInvoiceItemBtn:hover{opacity:.9}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ccc;padding:6px}
+</style>
+</head>
+<body>
+<header>
+  <h1>EFA FASHION ERP</h1>
+  <p id="headerSubtitle">إدارة زبائن ومحلات ومعامل وإيصالات وحسابات</p>
+  <div class="lang-switch">
+    <button type="button" onclick="setLanguage('ar')">عربي</button>
+    <button type="button" onclick="setLanguage('tr')">Türkçe</button>
+  </div>
+</header>
+<nav>
+  <button type="button" id="dashboardBtn" onclick="show('dashboard')">الرئيسية</button>
+  <button type="button" id="customersBtn" onclick="show('customers')">الزبائن</button>
+  <button type="button" id="shopsBtn" onclick="show('shops')">المحلات</button>
+  <button type="button" id="factoriesBtn" onclick="show('factories')">المعامل</button>
+  <button type="button" id="invoicesBtn" onclick="show('invoices')">الإيصالات</button>
+  <button type="button" id="accountsBtn" onclick="show('accounts')">الحسابات</button>
+</nav>
+
+<div id="dashboard" class="page active"><div class="card"><h2 id="dashboardTitle">لوحة التحكم</h2><p id="dashboardDesc">نظام EFA FASHION</p></div></div>
+
+<div id="customers" class="page"><div class="card"><h3 id="customersTitle">إضافة زبون</h3><input id="ccode" placeholder="كود الزبون"><input id="cname" placeholder="اسم الزبون"><input id="cphone" placeholder="هاتف"><input id="caddress" placeholder="العنوان"><input id="cnote" placeholder="ملاحظة"><button id="customersSaveBtn" type="button" onclick="addRecord('customersData')">حفظ</button><div id="customersView"></div></div></div>
+
+<div id="shops" class="page"><div class="card"><h3 id="shopsTitle">إضافة محل</h3><input id="scode" placeholder="كود المحل"><input id="sname" placeholder="اسم المحل"><input id="sphone" placeholder="هاتف"><input id="saddress" placeholder="عنوان"><input id="snote" placeholder="ملاحظة"><button id="shopsSaveBtn" type="button" onclick="addRecord('shopsData')">حفظ</button><div id="shopsView"></div></div></div>
+
+<div id="factories" class="page"><div class="card"><h3 id="factoriesTitle">إضافة معمل</h3><input id="fname" placeholder="اسم المعمل"><input id="fphone" placeholder="هاتف"><input id="faddress" placeholder="عنوان"><input id="fnote" placeholder="ملاحظة"><button id="factoriesSaveBtn" type="button" onclick="addRecord('factoriesData')">حفظ</button><div id="factoriesView"></div></div></div>
+
+<div id="invoices" class="page">
+<div class="card">
+<h3 id="invoicesTitle">الفروع</h3>
+<select id="invbranch">
+  <option value="MERKEZ">MERKEZ</option>
+  <option value="DEP0">DEP0</option>
+</select>
+<input id="invno" readonly placeholder="رقم الإيصال">
+<input type="date" id="invdate">
+<div id="invoiceItems">
+  <div class="item-row">
+    <input class="invoice-product" placeholder="اسم المنتج">
+    <input class="invoice-color" placeholder="اللون">
+    <input class="invoice-qty" placeholder="العدد">
+    <input class="invoice-price" placeholder="السعر">
+    <button type="button" class="item-delete-btn" onclick="removeInvoiceItem(this)">×</button>
+  </div>
+</div>
+<button id="addInvoiceItemBtn" type="button" onclick="addInvoiceItem()">+ إضافة منتج</button>
+<button id="invoiceSaveBtn" type="button" onclick="saveInvoice()">حفظ الإيصال</button>
+<button id="invoiceExportBtn" type="button" onclick="exportData('efa_invoices.json','efaInvoices')">تصدير الإيصالات</button>
+<div id="invoiceView"></div>
+</div></div>
+
+<div id="accounts" class="page">
+<div class="card">
+<h3 id="accountsTitle">حسابات الزبائن</h3>
+  <select id="acctype"><option value="customer">زبون</option><option value="shop">محل</option><option value="supplier">مورد</option></select>
+  <select id="acctEntity"><option value="">-</option></select>
+  <select id="accinv"><option value="" id="accInvPlaceholderOption">رقم الإيصال</option></select>
+  <input type="date" id="accdate">
+  <select id="currency"><option value="USD" id="currencyOpt1">دولار</option><option value="TRY" id="currencyOpt2">ليرة تركية</option><option value="CHK" id="currencyOpt3">شيك</option></select>
+  <input id="amount" placeholder="المبلغ">
+  <div id="checkFields" style="display:none">
+    <input type="date" id="checkDate" placeholder="تاريخ الشيك">
+    <input type="date" id="finalDate" placeholder="تاريخ آخر سداد">
+  </div>
+  <button id="accountSaveBtn" type="button" onclick="saveAccount()">حفظ</button>
+<button id="accountExportBtn" type="button" onclick="exportData('efa_accounts.json','efaAccounts')">تصدير الحسابات</button>
+<div id="accountView"></div>
+</div></div>
+
+<script>
+function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active'); load();}
+const recordFields={
+ customersData:{inputs:['ccode','cname','cphone','caddress','cnote'],props:['code','name','phone','address','note']},
+ shopsData:{inputs:['scode','sname','sphone','saddress','snote'],props:['code','name','phone','address','note']},
+ factoriesData:{inputs:['fname','fphone','faddress','fnote'],props:['name','phone','address','note']}
+};
+const editIndexes={customersData:-1,shopsData:-1,factoriesData:-1};
+let currentInvoiceEditIndex=-1;
+let currentAccountEditIndex=-1;
+function addInvoiceItem(product='', color='', qty='', price=''){
+ const container=document.getElementById('invoiceItems');
+ const row=document.createElement('div');
+ const t=translations[currentLang]||translations.ar;
+ row.className='item-row';
+ row.innerHTML=`<input class="invoice-product" placeholder="${t.invProductPlaceholder}" value="${product||''}">`+
+               `<input class="invoice-color" placeholder="${t.invColorPlaceholder}" value="${color||''}">`+
+               `<input class="invoice-qty" placeholder="${t.invQtyPlaceholder}" value="${qty||''}">`+
+               `<input class="invoice-price" placeholder="${t.invPricePlaceholder}" value="${price||''}">`+
+               `<button type="button" class="item-delete-btn" onclick="removeInvoiceItem(this)">×</button>`;
+ container.appendChild(row);
+}
+function resetInvoiceItems(){
+ const container=document.getElementById('invoiceItems');
+ container.innerHTML='';
+ addInvoiceItem();
+}
+function removeInvoiceItem(button){
+ const row=button.closest('.item-row');
+ const container=document.getElementById('invoiceItems');
+ if(!row||!container) return;
+ if(container.children.length>1){
+   container.removeChild(row);
+ } else {
+   resetInvoiceItems();
+ }
+}
+function addRecord(key){
+ const def=recordFields[key];
+ if(!def) return;
+ const values=def.inputs.map(id=>document.getElementById(id).value.trim());
+ if(!values[0]) return;
+ const data=JSON.parse(localStorage.getItem(key)||'[]');
+ const record=def.props.reduce((acc,p,i)=>{acc[p]=values[i];return acc;},{});
+ if(editIndexes[key]>=0){
+ data[editIndexes[key]]=record;
+ editIndexes[key]=-1;
+ } else {
+ data.push(record);
+ }
+ localStorage.setItem(key,JSON.stringify(data));
+ def.inputs.forEach(id=>document.getElementById(id).value='');
+ load();
+}
+function editRecord(key,index){
+ const data=JSON.parse(localStorage.getItem(key)||'[]');
+ if(index<0||index>=data.length) return;
+ const record=data[index];
+ const def=recordFields[key];
+ if(!def) return;
+ def.inputs.forEach((id,i)=>{
+ document.getElementById(id).value=record[def.props[i]]||'';
+ });
+ editIndexes[key]=index;
+}
+function saveInvoice(){
+ let invNo=document.getElementById('invno').value.trim();
+ const invDate=document.getElementById('invdate').value;
+ const invBranch=document.getElementById('invbranch').value;
+ const items=Array.from(document.querySelectorAll('#invoiceItems .item-row')).map(row=>({
+   product: row.querySelector('.invoice-product').value.trim(),
+   color: row.querySelector('.invoice-color').value.trim(),
+   qty: row.querySelector('.invoice-qty').value.trim(),
+   price: row.querySelector('.invoice-price').value.trim()
+ })).filter(item=>item.product);
+ const firstItem=items[0]||null;
+ if(!firstItem || !firstItem.product || !firstItem.qty || !firstItem.price){
+ const messages={ar:'اسم المنتج والعدد والسعر مطلوبان. يرجى التحقق.',tr:'Ürün adı, adet ve fiyat gereklidir. Lütfen kontrol edin.'};
+ alert(messages[currentLang]||messages.ar);
+ return;
+ }
+ if(items.some(item=>item.product && (!item.qty || !item.price))){
+ const messages={ar:'Her ürün için adet ve fiyat giriniz.',tr:'Her ürün için adet ve fiyat giriniz.'};
+ alert(messages[currentLang]||messages.ar);
+ return;
+ }
+ if(!invNo){
+ invNo=getNextInvoiceNumber();
+ document.getElementById('invno').value=invNo;
+ }
+ const data=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
+ const duplicateInvoice = data.some((item, idx)=>(item.no===invNo && idx!==currentInvoiceEditIndex));
+ if(duplicateInvoice){
+ const messages={ar:'رقم الإيصال مستخدم بالفعل. يرجى تغييره.',tr:'Fiş numarası zaten kullanılıyor. Lütfen değiştirin.'};
+ alert(messages[currentLang]||messages.ar);
+ return;
+ }
+ if(currentInvoiceEditIndex>=0){
+ data[currentInvoiceEditIndex]={no:invNo,date:invDate,branch:invBranch,items};
+ currentInvoiceEditIndex=-1;
+ } else {
+ data.push({no:invNo,date:invDate,branch:invBranch,items});
+ }
+ localStorage.setItem('efaInvoices',JSON.stringify(data));
+ document.getElementById('invno').value='';
+ document.getElementById('invdate').value='';
+ document.getElementById('invbranch').value='MERKEZ';
+ resetInvoiceItems();
+ currentInvoiceEditIndex=-1;
+ load();
+}
+function editInvoice(index){
+ const data=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
+ if(index<0||index>=data.length) return;
+ const item=data[index];
+ document.getElementById('invno').value=item.no||'';
+ document.getElementById('invdate').value=item.date||'';
+ document.getElementById('invbranch').value=item.branch||'MERKEZ';
+ const container=document.getElementById('invoiceItems');
+ container.innerHTML='';
+ const rows=Array.isArray(item.items) && item.items.length ? item.items : [{product:item.product||'', color:item.color||'', qty:item.qty||'', price:item.price||''}];
+ rows.forEach(it=>addInvoiceItem(it.product,it.color,it.qty,it.price));
+ currentInvoiceEditIndex=index;
+}
+function saveAccount(){
+ let invoice=document.getElementById('accinv').value.trim();
+ const date=document.getElementById('accdate').value;
+ const currency=document.getElementById('currency').value;
+ const amount=document.getElementById('amount').value.trim();
+ const type=document.getElementById('acctype').value;
+ const entityCode=document.getElementById('acctEntity').value;
+ // try to fetch entity name/details
+ let entityName='';
+ let entityObj=null;
+ if(entityCode){
+   const arr=(type==='customer')?JSON.parse(localStorage.getItem('customersData')||'[]'):(type==='shop'?JSON.parse(localStorage.getItem('shopsData')||'[]'):JSON.parse(localStorage.getItem('factoriesData')||'[]'));
+   entityObj=arr.find(it=> (it.code||it.name||'')===entityCode || (it.code===entityCode));
+   if(entityObj){ entityName=entityObj.name||''; }
+ }
+ if(!invoice){
+ const select=document.getElementById('accinv');
+ const autoOption=Array.from(select.options).find(o=>o.value);
+ if(autoOption){
+ invoice=autoOption.value;
+ }
+ }
+ if(!invoice || !amount){
+ const messages={ar:'رقم الإيصال والمبلغ مطلوبان. يرجى التحقق.',tr:'Fiş numarası ve tutar zorunludur. Lütfen kontrol edin.'};
+ alert(messages[currentLang]||messages.ar);
+ return;
+ }
+ const data=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
+ if(currentAccountEditIndex>=0){
+ data[currentAccountEditIndex]={type,entityCode,entityName,invoice,date,currency,amount,checkDate:document.getElementById('checkDate').value||'',finalDate:document.getElementById('finalDate').value||''};
+ currentAccountEditIndex=-1;
+ } else {
+ data.push({type,entityCode,entityName,invoice,date,currency,amount,checkDate:document.getElementById('checkDate').value||'',finalDate:document.getElementById('finalDate').value||''});
+ }
+ localStorage.setItem('efaAccounts',JSON.stringify(data));
+ document.getElementById('accinv').value='';
+ document.getElementById('accdate').value='';
+ document.getElementById('currency').value='USD';
+ document.getElementById('amount').value='';
+ load();
+}
+function editAccount(index){
+ const data=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
+ if(index<0||index>=data.length) return;
+ const item=data[index];
+  populateInvoiceSelect(item.invoice);
+  // populate entity select for the type
+  document.getElementById('acctype').value=item.type||'customer';
+  populateEntitySelect(item.type||'customer');
+  document.getElementById('acctEntity').value=item.entityCode||'';
+  document.getElementById('accinv').value=item.invoice||'';
+  document.getElementById('accdate').value=item.date||'';
+  document.getElementById('currency').value=item.currency||'USD';
+  document.getElementById('amount').value=item.amount||'';
+  document.getElementById('checkDate').value=item.checkDate||'';
+  document.getElementById('finalDate').value=item.finalDate||'';
+  toggleCheckFields();
+ currentAccountEditIndex=index;
+}
+function getNextInvoiceNumber(){
+ const data=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
+ let max=0;
+ data.forEach(item=>{
+ const match=(item.no||'').match(/EFA-(\d+)/);
+ if(match) max=Math.max(max,parseInt(match[1],10));
+ });
+ return 'EFA-'+String(max+1).padStart(5,'0');
+}
+function setNextInvoiceNumber(){
+ document.getElementById('invno').value=getNextInvoiceNumber();
+}
+function populateInvoiceSelect(currentInvoice){
+ const select=document.getElementById('accinv');
+ const invoices=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
+ const accounts=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
+ const used=accounts.map(a=>a.invoice);
+ const t=translations[currentLang]||translations.ar;
+ select.innerHTML='';
+ const placeholder=document.createElement('option');
+ placeholder.value='';
+ placeholder.textContent=t.accInvPlaceholder;
+ placeholder.disabled=true;
+ placeholder.selected=true;
+ select.appendChild(placeholder);
+ let currentInvoiceAdded=false;
+ invoices.forEach(item=>{
+ if(!item.no) return;
+ if(used.includes(item.no) && item.no!==currentInvoice) return;
+ const option=document.createElement('option');
+ option.value=item.no;
+ option.textContent=`${item.no}${item.date?` (${item.date})`:''}`;
+ if(item.no===currentInvoice) currentInvoiceAdded=true;
+ select.appendChild(option);
+ });
+ if(currentInvoice && !currentInvoiceAdded){
+ const option=document.createElement('option');
+ option.value=currentInvoice;
+ option.textContent=`${currentInvoice} ${t.deletedInvoiceLabel}`.trim();
+ select.appendChild(option);
+ }
+ // if editing, set current invoice; otherwise auto-select first available invoice
+  if(currentInvoice){
+    select.value=currentInvoice;
+  } else {
+    const opts=Array.from(select.options);
+    const firstOptIndex=opts.findIndex(o=>o.value);
+    if(firstOptIndex> -1){
+      select.selectedIndex=firstOptIndex;
+    }
+  }
+}
+// populate entity selector based on account type
+function populateEntitySelect(type){
+ const select=document.getElementById('acctEntity');
+ select.innerHTML='';
+ let arr=[];
+ if(type==='customer') arr=JSON.parse(localStorage.getItem('customersData')||'[]');
+ else if(type==='shop') arr=JSON.parse(localStorage.getItem('shopsData')||'[]');
+ else if(type==='supplier') arr=JSON.parse(localStorage.getItem('factoriesData')||'[]');
+ arr = arr.slice().reverse();
+ const placeholder=document.createElement('option');
+ placeholder.value='';
+ placeholder.textContent='-';
+ select.appendChild(placeholder);
+ arr.forEach(item=>{
+   const o=document.createElement('option');
+   o.value=item.code||item.name||'';
+   o.textContent=`${item.code?item.code+' - ':''}${item.name||item.name||''}`;
+   select.appendChild(o);
+ });
+}
+
+function toggleCheckFields(){
+ const cur=document.getElementById('currency').value;
+ const el=document.getElementById('checkFields');
+ if(cur==='CHK'){
+   el.style.display='block';
+   // default check date to today if empty
+   const cd=document.getElementById('checkDate');
+   const fd=document.getElementById('finalDate');
+   const today=new Date().toISOString().slice(0,10);
+   if(cd && !cd.value) cd.value=today;
+   if(fd && !fd.value) fd.value='';
+ } else {
+   el.style.display='none';
+ }
+}
+
+// attach handlers
+document.addEventListener('DOMContentLoaded',()=>{
+ const at=document.getElementById('acctype');
+ if(at) at.addEventListener('change',e=>populateEntitySelect(e.target.value));
+ const cur=document.getElementById('currency');
+ if(cur) cur.addEventListener('change',toggleCheckFields);
+ populateEntitySelect(document.getElementById('acctype').value);
+ toggleCheckFields();
+});
+function exportData(file,key){
+ const data=localStorage.getItem(key)||'[]';
+ const blob=new Blob([data],{type:'application/json'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download=file;
+ a.click();
+}
+function deleteSimple(key,index){
+ const data=JSON.parse(localStorage.getItem(key)||'[]');
+ if(index<0||index>=data.length) return;
+ data.splice(index,1);
+ localStorage.setItem(key,JSON.stringify(data));
+ load();
+}
+function deleteInvoice(index){
+ const data=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
+ if(index<0||index>=data.length) return;
+ data.splice(index,1);
+ if(currentInvoiceEditIndex===index){
+ currentInvoiceEditIndex=-1;
+ document.getElementById('invno').value='';
+ document.getElementById('invdate').value='';
+ document.getElementById('invbranch').value='MERKEZ';
+ resetInvoiceItems();
+ }
+ localStorage.setItem('efaInvoices',JSON.stringify(data));
+ load();
+}
+function deleteAccount(index){
+ const data=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
+ if(index<0||index>=data.length) return;
+ data.splice(index,1);
+ if(currentAccountEditIndex===index){
+ currentAccountEditIndex=-1;
+ document.getElementById('accinv').value='';
+ document.getElementById('accdate').value='';
+ document.getElementById('currency').value='USD';
+ document.getElementById('amount').value='';
+ }
+ localStorage.setItem('efaAccounts',JSON.stringify(data));
+ load();
+}
+const translations={
+ ar:{
+ headerSubtitle:'إدارة زبائن ومحلات ومعامل وإيصالات وحسابات',
+ dashboardTitle:'لوحة التحكم',
+ dashboardDesc:'نظام EFA FASHION',
+ customersTitle:'إضافة زبون',
+ customersSave:'حفظ',
+ customersCodePlaceholder:'كود الزبون',
+ customersPlaceholder:'اسم الزبون',
+ shopsTitle:'إضافة محل',
+ shopsSave:'حفظ',
+ shopsCodePlaceholder:'كود المحل',
+ shopsPlaceholder:'اسم المحل',
+ factoriesTitle:'إضافة معمل',
+ factoriesSave:'حفظ',
+ factoriesPlaceholder:'اسم المعمل',
+ factoriesPhonePlaceholder:'هاتف',
+ factoriesAddressPlaceholder:'العنوان',
+ factoriesNotePlaceholder:'ملاحظة',
+ customersPhonePlaceholder:'هاتف',
+ customersAddressPlaceholder:'العنوان',
+ customersNotePlaceholder:'ملاحظة',
+ shopsPhonePlaceholder:'هاتف',
+ shopsAddressPlaceholder:'عنوان',
+ shopsNotePlaceholder:'ملاحظة',
+ invoicesTitle:'الفروع',
+ invoiceSave:'حفظ الإيصال',
+ invoiceExport:'تصدير الإيصالات',
+ invNoPlaceholder:'رقم الإيصال',
+ invProductPlaceholder:'اسم المنتج',
+ invQtyPlaceholder:'العدد',
+ invColorPlaceholder:'اللون',
+ invPricePlaceholder:'السعر',
+ invoiceNoHeader:'رقم',
+ invoiceDateHeader:'تاريخ',
+ invoiceBranchHeader:'الفرع',
+ invoiceProductHeader:'منتج',
+ invoiceQtyHeader:'عدد',
+ invoiceColorHeader:'اللون',
+ invoicePriceHeader:'السعر',
+ noInvoices:'لا توجد إيصالات',
+ addInvoiceItemBtn:'+ إضافة منتج',
+ noAccounts:'لا توجد حسابات',
+ accInvTableHeader:'رقم إيصال',
+ accountDateHeader:'تاريخ',
+ accAmountHeader:'مبلغ',
+ accountCurrencyHeader:'عملة',
+ deletedInvoiceLabel:'(تم حذفه)',
+ accountsTitle:'حسابات الزبائن',
+ accountSave:'حفظ',
+ accountExport:'تصدير الحسابات',
+ accInvPlaceholder:'رقم الإيصال',
+ accAmountPlaceholder:'المبلغ',
+ accTypeHeader:'نوع الحساب',
+ accEntityHeader:'الكيان',
+ checkDateLabel:'تاريخ الشيك',
+ finalDateLabel:'تاريخ آخر سداد',
+ upcomingChecksTitle:'الشيكات القادمة',
+  accTypeCustomer:'زبون',
+  accTypeShop:'محل',
+  accTypeSupplier:'مورد',
+  selectEntityPlaceholder:'اختار',
+  currencyCheck:'شيك',
+ navDashboard:'الرئيسية',
+ navCustomers:'الزبائن',
+ navShops:'المحلات',
+ navFactories:'المعامل',
+ navInvoices:'الفروع',
+ navAccounts:'الحسابات',
+ currencyDollar:'دولار',
+ currencyTry:'ليرة تركية',
+ deleteBtn:'حذف',
+ editBtn:'تعديل',
+ deleteHeader:'حذف',
+ editHeader:'تعديل'
+ },
+ tr:{
+ headerSubtitle:'Müşteri, mağaza, fabrika, fiş ve hesap yönetimi',
+ dashboardTitle:'Kontrol Paneli',
+ dashboardDesc:'EFA FASHION sistemi',
+ customersTitle:'Müşteri Ekle',
+ customersSave:'Kaydet',
+ customersCodePlaceholder:'Müşteri Kodu',
+ customersPlaceholder:'Müşteri Adı',
+ customersPhonePlaceholder:'Telefon',
+ customersAddressPlaceholder:'Adres',
+ customersNotePlaceholder:'Not',
+ shopsTitle:'Mağaza Ekle',
+ shopsSave:'Kaydet',
+ shopsCodePlaceholder:'Mağaza Kodu',
+ shopsPlaceholder:'Mağaza Adı',
+ shopsPhonePlaceholder:'Telefon',
+ shopsAddressPlaceholder:'Adres',
+ shopsNotePlaceholder:'Not',
+ factoriesTitle:'Fabrika Ekle',
+ factoriesSave:'Kaydet',
+ factoriesPlaceholder:'Fabrika Adı',
+ factoriesPhonePlaceholder:'Telefon',
+ factoriesAddressPlaceholder:'Adres',
+ factoriesNotePlaceholder:'Not',
+ customersPhonePlaceholder:'Telefon',
+ customersAddressPlaceholder:'Adres',
+ customersNotePlaceholder:'Not',
+ shopsPhonePlaceholder:'Telefon',
+ shopsAddressPlaceholder:'Adres',
+ shopsNotePlaceholder:'Not',
+ invoicesTitle:'Şubeler',
+ invoiceSave:'Fişi Kaydet',
+ invoiceExport:'Fişleri Dışa Aktar',
+ invNoPlaceholder:'Fiş Numarası',
+ invProductPlaceholder:'Ürün Adı',
+ invQtyPlaceholder:'Adet',
+ invColorPlaceholder:'Renk',
+ invPricePlaceholder:'Fiyat',
+ invTrypPlaceholder:'Fiyat (TRY)',
+ addInvoiceItemBtn:'+ Ürün Ekle',
+ invoiceNoHeader:'Numara',
+ invoiceBranchHeader:'Şube',
+ invoiceProductHeader:'Ürün',
+ invoiceQtyHeader:'Adet',
+ invoiceColorHeader:'Renk',
+ invoicePriceHeader:'Fiyat',
+ noInvoices:'Fiş yok',
+ noAccounts:'Hesap yok',
+ accInvTableHeader:'Fiş Numarası',
+ accountDateHeader:'Tarih',
+ accAmountHeader:'Tutar',
+ accountCurrencyHeader:'Para Birimi',
+ deletedInvoiceLabel:'(silindi)',
+ accountsTitle:'Müşteri Hesapları',
+ accountSave:'Kaydet',
+ accountExport:'Hesapları Dışa Aktar',
+ accInvPlaceholder:'Fiş Numarası',
+ accAmountPlaceholder:'Tutar',
+ accTypeHeader:'Hesap Türü',
+ accEntityHeader:'Varlık',
+ checkDateLabel:'Çek Tarihi',
+ finalDateLabel:'Son Ödeme',
+ upcomingChecksTitle:'Yaklaşan Çekler',
+  accTypeCustomer:'Müşteri',
+  accTypeShop:'Mağaza',
+  accTypeSupplier:'Tedarikçi',
+  selectEntityPlaceholder:'Seçiniz',
+  currencyCheck:'Çek',
+ navDashboard:'Anasayfa',
+ navCustomers:'Müşteriler',
+ navShops:'Mağazalar',
+ navFactories:'Fabrikalar',
+ navInvoices:'Şubeler',
+ navAccounts:'Hesaplar',
+ currencyDollar:'Dolar',
+ currencyTry:'Türk Lirası',
+ deleteBtn:'Sil',
+ editBtn:'Düzenle',
+ deleteHeader:'Sil',
+ editHeader:'Düzenle'
+ }
+};
+let currentLang='ar';
+function load(){
+ const t=translations[currentLang]||translations.ar;
+ const customersView=document.getElementById('customersView');
+ const shopsView=document.getElementById('shopsView');
+ const factoriesView=document.getElementById('factoriesView');
+ const invoiceView=document.getElementById('invoiceView');
+ const accountView=document.getElementById('accountView');
+ const customers=JSON.parse(localStorage.getItem('customersData')||'[]');
+ customersView.innerHTML=customers.map((item,index)=>`<div><strong>${item.code}</strong> - ${item.name}<br>${item.phone}<br>${item.address}<br>${item.note}<br><button class="delete-btn" type="button" onclick="editRecord('customersData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('customersData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
+ const shops=JSON.parse(localStorage.getItem('shopsData')||'[]');
+ shopsView.innerHTML=shops.map((item,index)=>`<div><strong>${item.code}</strong> - ${item.name}<br>${item.phone}<br>${item.address}<br>${item.note}<br><button class="delete-btn" type="button" onclick="editRecord('shopsData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('shopsData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
+ const factories=JSON.parse(localStorage.getItem('factoriesData')||'[]');
+ factoriesView.innerHTML=factories.map((item,index)=>`<div><strong>${item.name}</strong><br>${item.phone}<br>${item.address}<br>${item.note}<br><button class="delete-btn" type="button" onclick="editRecord('factoriesData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('factoriesData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
+ const inv=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
+ const invoiceTable = inv.length ? '<table><tr><th>'+t.invoiceNoHeader+'</th><th>'+t.invoiceDateHeader+'</th><th>'+t.invoiceBranchHeader+'</th><th>'+t.invoiceProductHeader+'</th><th>'+t.invoiceQtyHeader+'</th><th>'+t.invoiceColorHeader+'</th><th>'+t.invoicePriceHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+inv.map((i,index)=>`<tr><td>${i.no}</td><td>${i.date}</td><td>${i.branch||''}</td><td>${Array.isArray(i.items)?i.items.map(it=>it.product||'').join('<br>'):i.product||''}</td><td>${Array.isArray(i.items)?i.items.map(it=>it.qty||'').join('<br>'):i.qty||''}</td><td>${Array.isArray(i.items)?i.items.map(it=>it.color||'').join('<br>'):i.color||''}</td><td>${Array.isArray(i.items)?i.items.map(it=>it.price||'').join('<br>'):i.price||''}</td><td><button class="delete-btn" type="button" onclick="editInvoice(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteInvoice(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>' : '<div>'+t.noInvoices+'</div>';
+ invoiceView.innerHTML=invoiceTable;
+ const acc=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
+ if(acc.length){
+ accountView.innerHTML='<table><tr><th>'+t.accTypeHeader+'</th><th>'+t.accEntityHeader+'</th><th>'+t.accInvTableHeader+'</th><th>'+t.accountDateHeader+'</th><th>'+t.accAmountHeader+'</th><th>'+t.accountCurrencyHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+acc.map((a,index)=>`<tr><td>${a.type}</td><td>${a.entityCode?`${a.entityCode} - ${a.entityName||''}`:''}<br></td><td>${a.invoice}</td><td>${a.date||''}${a.checkDate?`<br>${t.checkDateLabel}: ${a.checkDate}`:''}${a.finalDate?`<br>${t.finalDateLabel}: ${a.finalDate}`:''}</td><td>${a.amount}</td><td>${a.currency}</td><td><button class="delete-btn" type="button" onclick="editAccount(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteAccount(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>';
+ } else {
+ accountView.innerHTML='<div>'+t.noAccounts+'</div>';
+ }
+
+// dashboard: upcoming checks
+try{
+ const dashboard=document.getElementById('dashboard');
+ const checks=acc.filter(a=>a.currency==='CHK'&&a.finalDate);
+ if(checks.length){
+   const list=checks.map(c=>`<div><strong>${c.entityCode||c.entityName}</strong> ${c.amount} ${c.currency}<br>${t.checkDateLabel}: ${c.checkDate||''} <br>${t.finalDateLabel}: ${c.finalDate||''}</div>`).join('<hr>');
+   let upcoming=document.getElementById('upcomingChecks');
+   if(!upcoming){
+     upcoming=document.createElement('div'); upcoming.id='upcomingChecks';
+     dashboard.querySelector('.card').appendChild(upcoming);
+   }
+   upcoming.innerHTML='<h4>'+t.upcomingChecksTitle+'</h4>'+list;
+ } else {
+   const uc=document.getElementById('upcomingChecks'); if(uc) uc.innerHTML='';
+ }
+}catch(e){}
+ if(currentInvoiceEditIndex<0) setNextInvoiceNumber();
+ populateInvoiceSelect();
+}
+function setNextInvoiceNumber(){
+ if(currentInvoiceEditIndex<0){
+  document.getElementById('invno').value=getNextInvoiceNumber();
+ }
+}
+function setLanguage(lang){
+ currentLang=lang;
+ const t=translations[lang]||translations.ar;
+ document.documentElement.lang=lang;
+ document.documentElement.dir=(lang==='ar'?'rtl':'ltr');
+ document.getElementById('headerSubtitle').textContent=t.headerSubtitle;
+ document.getElementById('dashboardTitle').textContent=t.dashboardTitle;
+ document.getElementById('dashboardDesc').textContent=t.dashboardDesc;
+ document.getElementById('customersTitle').textContent=t.customersTitle;
+ document.getElementById('customersSaveBtn').textContent=t.customersSave;
+ document.getElementById('ccode').placeholder=t.customersCodePlaceholder;
+ document.getElementById('cname').placeholder=t.customersPlaceholder;
+ document.getElementById('cphone').placeholder=t.customersPhonePlaceholder;
+ document.getElementById('caddress').placeholder=t.customersAddressPlaceholder;
+ document.getElementById('cnote').placeholder=t.customersNotePlaceholder;
+ document.getElementById('shopsTitle').textContent=t.shopsTitle;
+ document.getElementById('shopsSaveBtn').textContent=t.shopsSave;
+ document.getElementById('scode').placeholder=t.shopsCodePlaceholder;
+ document.getElementById('sname').placeholder=t.shopsPlaceholder;
+ document.getElementById('sphone').placeholder=t.shopsPhonePlaceholder;
+ document.getElementById('saddress').placeholder=t.shopsAddressPlaceholder;
+ document.getElementById('snote').placeholder=t.shopsNotePlaceholder;
+ document.getElementById('factoriesTitle').textContent=t.factoriesTitle;
+ document.getElementById('factoriesSaveBtn').textContent=t.factoriesSave;
+ document.getElementById('fname').placeholder=t.factoriesPlaceholder;
+ document.getElementById('fphone').placeholder=t.factoriesPhonePlaceholder;
+ document.getElementById('faddress').placeholder=t.factoriesAddressPlaceholder;
+ document.getElementById('fnote').placeholder=t.factoriesNotePlaceholder;
+ document.getElementById('invoicesTitle').textContent=t.invoicesTitle;
+ document.getElementById('invoiceSaveBtn').textContent=t.invoiceSave;
+ document.getElementById('invoiceExportBtn').textContent=t.invoiceExport;
+ document.getElementById('invno').placeholder=t.invNoPlaceholder;
+ document.querySelectorAll('.invoice-product').forEach(el=>el.placeholder=t.invProductPlaceholder);
+ document.querySelectorAll('.invoice-color').forEach(el=>el.placeholder=t.invColorPlaceholder);
+ document.querySelectorAll('.invoice-qty').forEach(el=>el.placeholder=t.invQtyPlaceholder);
+ document.querySelectorAll('.invoice-price').forEach(el=>el.placeholder=t.invPricePlaceholder);
+ document.getElementById('accountsTitle').textContent=t.accountsTitle;
+ document.getElementById('accountSaveBtn').textContent=t.accountSave;
+ document.getElementById('accountExportBtn').textContent=t.accountExport;
+ document.getElementById('accinv').placeholder=t.accInvPlaceholder;
+ document.getElementById('amount').placeholder=t.accAmountPlaceholder;
+ document.getElementById('acctype').value='customer';
+ // localize acctype options
+ const at=document.getElementById('acctype');
+ if(at){
+   at.options[0].textContent=t.accTypeCustomer;
+   at.options[1].textContent=t.accTypeShop;
+   at.options[2].textContent=t.accTypeSupplier;
+ }
+ const ae=document.getElementById('acctEntity');
+ if(ae){ ae.innerHTML=''; const ph=document.createElement('option'); ph.value=''; ph.textContent=t.selectEntityPlaceholder; ae.appendChild(ph); }
+ document.getElementById('currency').value='USD';
+ // localize currency check option
+ const c3=document.getElementById('currencyOpt3'); if(c3) c3.textContent=t.currencyCheck;
+ // set invoice placeholder option
+ const accOpt=document.getElementById('accInvPlaceholderOption'); if(accOpt) accOpt.textContent=t.accInvPlaceholder;
+ // set labels for check placeholders if present
+ if(document.getElementById('checkDate')) document.getElementById('checkDate').placeholder=t.checkDateLabel;
+ if(document.getElementById('finalDate')) document.getElementById('finalDate').placeholder=t.finalDateLabel;
+ // refresh entity list for current acctype
+ populateEntitySelect(document.getElementById('acctype').value);
+ // ensure check fields visibility matches current currency
+ toggleCheckFields();
+ document.getElementById('dashboardBtn').textContent=t.navDashboard;
+ document.getElementById('customersBtn').textContent=t.navCustomers;
+ document.getElementById('shopsBtn').textContent=t.navShops;
+ document.getElementById('factoriesBtn').textContent=t.navFactories;
+ document.getElementById('invoicesBtn').textContent=t.navInvoices;
+ document.getElementById('accountsBtn').textContent=t.navAccounts;
+ document.getElementById('currencyOpt1').textContent=t.currencyDollar;
+ document.getElementById('currencyOpt2').textContent=t.currencyTry;
+ const addInvoiceItemBtn=document.getElementById('addInvoiceItemBtn');
+ if(addInvoiceItemBtn) addInvoiceItemBtn.textContent=t.addInvoiceItemBtn;
+ load();
+}
+load();
+setLanguage('ar');
+</script>
+</body>
+</html>
