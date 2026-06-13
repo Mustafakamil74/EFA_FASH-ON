@@ -95,6 +95,9 @@ th,td{border:1px solid #ccc;padding:6px}
 </div></div>
 
 <script>
+function escapeHtml(value){
+ return String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active'); load();}
 const recordFields={
  customersData:{inputs:['ccode','cname','cphone','caddress','cnote'],props:['code','name','phone','address','note']},
@@ -109,10 +112,10 @@ function addInvoiceItem(product='', color='', qty='', price=''){
  const row=document.createElement('div');
  const t=translations[currentLang]||translations.ar;
  row.className='item-row';
- row.innerHTML=`<input class="invoice-product" placeholder="${t.invProductPlaceholder}" value="${product||''}">`+
-               `<input class="invoice-color" placeholder="${t.invColorPlaceholder}" value="${color||''}">`+
-               `<input class="invoice-qty" placeholder="${t.invQtyPlaceholder}" value="${qty||''}">`+
-               `<input class="invoice-price" placeholder="${t.invPricePlaceholder}" value="${price||''}">`+
+ row.innerHTML=`<input class="invoice-product" placeholder="${t.invProductPlaceholder}" value="${escapeHtml(product)}">`+
+               `<input class="invoice-color" placeholder="${t.invColorPlaceholder}" value="${escapeHtml(color)}">`+
+               `<input class="invoice-qty" placeholder="${t.invQtyPlaceholder}" value="${escapeHtml(qty)}">`+
+               `<input class="invoice-price" placeholder="${t.invPricePlaceholder}" value="${escapeHtml(price)}">`+
                `<button type="button" class="item-delete-btn" onclick="removeInvoiceItem(this)">×</button>`;
  container.appendChild(row);
 }
@@ -585,17 +588,17 @@ function load(){
  const invoiceView=document.getElementById('invoiceView');
  const accountView=document.getElementById('accountView');
  const customers=JSON.parse(localStorage.getItem('customersData')||'[]');
- customersView.innerHTML=customers.map((item,index)=>`<div><strong>${item.code}</strong> - ${item.name}<br>${item.phone}<br>${item.address}<br>${item.note}<br><button class="delete-btn" type="button" onclick="editRecord('customersData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('customersData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
+ customersView.innerHTML=customers.map((item,index)=>`<div><strong>${escapeHtml(item.code)}</strong> - ${escapeHtml(item.name)}<br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('customersData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('customersData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
  const shops=JSON.parse(localStorage.getItem('shopsData')||'[]');
- shopsView.innerHTML=shops.map((item,index)=>`<div><strong>${item.code}</strong> - ${item.name}<br>${item.phone}<br>${item.address}<br>${item.note}<br><button class="delete-btn" type="button" onclick="editRecord('shopsData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('shopsData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
+ shopsView.innerHTML=shops.map((item,index)=>`<div><strong>${escapeHtml(item.code)}</strong> - ${escapeHtml(item.name)}<br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('shopsData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('shopsData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
  const factories=JSON.parse(localStorage.getItem('factoriesData')||'[]');
- factoriesView.innerHTML=factories.map((item,index)=>`<div><strong>${item.name}</strong><br>${item.phone}<br>${item.address}<br>${item.note}<br><button class="delete-btn" type="button" onclick="editRecord('factoriesData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('factoriesData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
+ factoriesView.innerHTML=factories.map((item,index)=>`<div><strong>${escapeHtml(item.name)}</strong><br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('factoriesData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('factoriesData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
  const inv=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
- const invoiceTable = inv.length ? '<table><tr><th>'+t.invoiceNoHeader+'</th><th>'+t.invoiceDateHeader+'</th><th>'+t.invoiceBranchHeader+'</th><th>'+t.invoiceProductHeader+'</th><th>'+t.invoiceQtyHeader+'</th><th>'+t.invoiceColorHeader+'</th><th>'+t.invoicePriceHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+inv.map((i,index)=>`<tr><td>${i.no}</td><td>${i.date}</td><td>${i.branch||''}</td><td>${Array.isArray(i.items)?i.items.map(it=>it.product||'').join('<br>'):i.product||''}</td><td>${Array.isArray(i.items)?i.items.map(it=>it.qty||'').join('<br>'):i.qty||''}</td><td>${Array.isArray(i.items)?i.items.map(it=>it.color||'').join('<br>'):i.color||''}</td><td>${Array.isArray(i.items)?i.items.map(it=>it.price||'').join('<br>'):i.price||''}</td><td><button class="delete-btn" type="button" onclick="editInvoice(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteInvoice(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>' : '<div>'+t.noInvoices+'</div>';
+ const invoiceTable = inv.length ? '<table><tr><th>'+t.invoiceNoHeader+'</th><th>'+t.invoiceDateHeader+'</th><th>'+t.invoiceBranchHeader+'</th><th>'+t.invoiceProductHeader+'</th><th>'+t.invoiceQtyHeader+'</th><th>'+t.invoiceColorHeader+'</th><th>'+t.invoicePriceHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+inv.map((i,index)=>`<tr><td>${escapeHtml(i.no)}</td><td>${escapeHtml(i.date)}</td><td>${escapeHtml(i.branch||'')}</td><td>${Array.isArray(i.items)?i.items.map(it=>escapeHtml(it.product||'')).join('<br>'):escapeHtml(i.product||'')}</td><td>${Array.isArray(i.items)?i.items.map(it=>escapeHtml(it.qty||'')).join('<br>'):escapeHtml(i.qty||'')}</td><td>${Array.isArray(i.items)?i.items.map(it=>escapeHtml(it.color||'')).join('<br>'):escapeHtml(i.color||'')}</td><td>${Array.isArray(i.items)?i.items.map(it=>escapeHtml(it.price||'')).join('<br>'):escapeHtml(i.price||'')}</td><td><button class="delete-btn" type="button" onclick="editInvoice(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteInvoice(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>' : '<div>'+t.noInvoices+'</div>';
  invoiceView.innerHTML=invoiceTable;
  const acc=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
  if(acc.length){
- accountView.innerHTML='<table><tr><th>'+t.accTypeHeader+'</th><th>'+t.accEntityHeader+'</th><th>'+t.accInvTableHeader+'</th><th>'+t.accountDateHeader+'</th><th>'+t.accAmountHeader+'</th><th>'+t.accountCurrencyHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+acc.map((a,index)=>`<tr><td>${a.type}</td><td>${a.entityCode?`${a.entityCode} - ${a.entityName||''}`:''}<br></td><td>${a.invoice}</td><td>${a.date||''}${a.checkDate?`<br>${t.checkDateLabel}: ${a.checkDate}`:''}${a.finalDate?`<br>${t.finalDateLabel}: ${a.finalDate}`:''}</td><td>${a.amount}</td><td>${a.currency}</td><td><button class="delete-btn" type="button" onclick="editAccount(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteAccount(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>';
+ accountView.innerHTML='<table><tr><th>'+t.accTypeHeader+'</th><th>'+t.accEntityHeader+'</th><th>'+t.accInvTableHeader+'</th><th>'+t.accountDateHeader+'</th><th>'+t.accAmountHeader+'</th><th>'+t.accountCurrencyHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+acc.map((a,index)=>`<tr><td>${escapeHtml(a.type)}</td><td>${a.entityCode?`${escapeHtml(a.entityCode)} - ${escapeHtml(a.entityName||'')}`:''}<br></td><td>${escapeHtml(a.invoice)}</td><td>${escapeHtml(a.date||'')}${a.checkDate?`<br>${t.checkDateLabel}: ${escapeHtml(a.checkDate)}`:''}${a.finalDate?`<br>${t.finalDateLabel}: ${escapeHtml(a.finalDate)}`:''}</td><td>${escapeHtml(a.amount)}</td><td>${escapeHtml(a.currency)}</td><td><button class="delete-btn" type="button" onclick="editAccount(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteAccount(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>';
  } else {
  accountView.innerHTML='<div>'+t.noAccounts+'</div>';
  }
@@ -605,7 +608,7 @@ try{
  const dashboard=document.getElementById('dashboard');
  const checks=acc.filter(a=>a.currency==='CHK'&&a.finalDate);
  if(checks.length){
-   const list=checks.map(c=>`<div><strong>${c.entityCode||c.entityName}</strong> ${c.amount} ${c.currency}<br>${t.checkDateLabel}: ${c.checkDate||''} <br>${t.finalDateLabel}: ${c.finalDate||''}</div>`).join('<hr>');
+   const list=checks.map(c=>`<div><strong>${escapeHtml(c.entityCode||c.entityName)}</strong> ${escapeHtml(c.amount)} ${escapeHtml(c.currency)}<br>${t.checkDateLabel}: ${escapeHtml(c.checkDate||'')} <br>${t.finalDateLabel}: ${escapeHtml(c.finalDate||'')}</div>`).join('<hr>');
    let upcoming=document.getElementById('upcomingChecks');
    if(!upcoming){
      upcoming=document.createElement('div'); upcoming.id='upcomingChecks';
