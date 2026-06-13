@@ -44,13 +44,13 @@ th,td{border:1px solid #ccc;padding:6px}
   <button type="button" id="accountsBtn" onclick="show('accounts')">الحسابات</button>
 </nav>
 
-<div id="dashboard" class="page active"><div class="card"><h2 id="dashboardTitle">لوحة التحكم</h2><p id="dashboardDesc">نظام EFA FASHION</p></div></div>
+<div id="dashboard" class="page active"><div class="card"><h2 id="dashboardTitle">لوحة التحكم</h2><p id="dashboardDesc">نظام EFA FASHION</p><button id="backupAllBtn" type="button" onclick="backupAll()">نسخ احتياطي شامل</button> <button id="restoreAllBtn" type="button" onclick="restoreAll()">استعادة شاملة</button></div></div>
 
-<div id="customers" class="page"><div class="card"><h3 id="customersTitle">إضافة زبون</h3><input id="ccode" placeholder="كود الزبون"><input id="cname" placeholder="اسم الزبون"><input id="cphone" placeholder="هاتف"><input id="caddress" placeholder="العنوان"><input id="cnote" placeholder="ملاحظة"><button id="customersSaveBtn" type="button" onclick="addRecord('customersData')">حفظ</button><div id="customersView"></div></div></div>
+<div id="customers" class="page"><div class="card"><h3 id="customersTitle">إضافة زبون</h3><input id="ccode" placeholder="كود الزبون"><input id="cname" placeholder="اسم الزبون"><input id="cphone" placeholder="هاتف"><input id="caddress" placeholder="العنوان"><input id="cnote" placeholder="ملاحظة"><button id="customersSaveBtn" type="button" onclick="addRecord('customersData')">حفظ</button> <button id="customersExportBtn" type="button" onclick="exportData('efa_customers.json','customersData')">تصدير</button> <button id="customersImportBtn" type="button" onclick="importData('customersData')">استيراد</button><div id="customersView"></div></div></div>
 
-<div id="shops" class="page"><div class="card"><h3 id="shopsTitle">إضافة محل</h3><input id="scode" placeholder="كود المحل"><input id="sname" placeholder="اسم المحل"><input id="sphone" placeholder="هاتف"><input id="saddress" placeholder="عنوان"><input id="snote" placeholder="ملاحظة"><button id="shopsSaveBtn" type="button" onclick="addRecord('shopsData')">حفظ</button><div id="shopsView"></div></div></div>
+<div id="shops" class="page"><div class="card"><h3 id="shopsTitle">إضافة محل</h3><input id="scode" placeholder="كود المحل"><input id="sname" placeholder="اسم المحل"><input id="sphone" placeholder="هاتف"><input id="saddress" placeholder="عنوان"><input id="snote" placeholder="ملاحظة"><button id="shopsSaveBtn" type="button" onclick="addRecord('shopsData')">حفظ</button> <button id="shopsExportBtn" type="button" onclick="exportData('efa_shops.json','shopsData')">تصدير</button> <button id="shopsImportBtn" type="button" onclick="importData('shopsData')">استيراد</button><div id="shopsView"></div></div></div>
 
-<div id="factories" class="page"><div class="card"><h3 id="factoriesTitle">إضافة معمل</h3><input id="fname" placeholder="اسم المعمل"><input id="fphone" placeholder="هاتف"><input id="faddress" placeholder="عنوان"><input id="fnote" placeholder="ملاحظة"><button id="factoriesSaveBtn" type="button" onclick="addRecord('factoriesData')">حفظ</button><div id="factoriesView"></div></div></div>
+<div id="factories" class="page"><div class="card"><h3 id="factoriesTitle">إضافة معمل</h3><input id="fname" placeholder="اسم المعمل"><input id="fphone" placeholder="هاتف"><input id="faddress" placeholder="عنوان"><input id="fnote" placeholder="ملاحظة"><button id="factoriesSaveBtn" type="button" onclick="addRecord('factoriesData')">حفظ</button> <button id="factoriesExportBtn" type="button" onclick="exportData('efa_factories.json','factoriesData')">تصدير</button> <button id="factoriesImportBtn" type="button" onclick="importData('factoriesData')">استيراد</button><div id="factoriesView"></div></div></div>
 
 <div id="invoices" class="page">
 <div class="card">
@@ -73,6 +73,7 @@ th,td{border:1px solid #ccc;padding:6px}
 <button id="addInvoiceItemBtn" type="button" onclick="addInvoiceItem()">+ إضافة منتج</button>
 <button id="invoiceSaveBtn" type="button" onclick="saveInvoice()">حفظ الإيصال</button>
 <button id="invoiceExportBtn" type="button" onclick="exportData('efa_invoices.json','efaInvoices')">تصدير الإيصالات</button>
+<button id="invoiceImportBtn" type="button" onclick="importData('efaInvoices')">استيراد الإيصالات</button>
 <div id="invoiceView"></div>
 </div></div>
 
@@ -91,6 +92,7 @@ th,td{border:1px solid #ccc;padding:6px}
   </div>
   <button id="accountSaveBtn" type="button" onclick="saveAccount()">حفظ</button>
 <button id="accountExportBtn" type="button" onclick="exportData('efa_accounts.json','efaAccounts')">تصدير الحسابات</button>
+<button id="accountImportBtn" type="button" onclick="importData('efaAccounts')">استيراد الحسابات</button>
 <div id="accountView"></div>
 </div></div>
 
@@ -400,6 +402,56 @@ function exportData(file,key){
  a.download=file;
  a.click();
 }
+const ALL_DATA_KEYS=['customersData','shopsData','factoriesData','productsData','efaInvoices','efaAccounts'];
+function downloadJson(file,obj){
+ const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download=file;
+ a.click();
+}
+function pickJsonFile(onParsed){
+ const t=translations[currentLang]||translations.ar;
+ const input=document.createElement('input');
+ input.type='file';
+ input.accept='application/json,.json';
+ input.onchange=()=>{
+  const file=input.files&&input.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+   try{ onParsed(JSON.parse(reader.result)); }
+   catch(e){ alert(t.importError); }
+  };
+  reader.readAsText(file);
+ };
+ input.click();
+}
+function importData(key){
+ const t=translations[currentLang]||translations.ar;
+ pickJsonFile(parsed=>{
+  if(!Array.isArray(parsed)){ alert(t.importError); return; }
+  if(!confirm(t.importConfirm)) return;
+  localStorage.setItem(key,JSON.stringify(parsed));
+  load();
+  alert(t.importDone);
+ });
+}
+function backupAll(){
+ const dump={};
+ ALL_DATA_KEYS.forEach(k=>{ dump[k]=JSON.parse(localStorage.getItem(k)||'[]'); });
+ downloadJson('efa_backup.json',dump);
+}
+function restoreAll(){
+ const t=translations[currentLang]||translations.ar;
+ pickJsonFile(parsed=>{
+  if(!parsed||typeof parsed!=='object'||Array.isArray(parsed)){ alert(t.importError); return; }
+  if(!confirm(t.restoreConfirm)) return;
+  ALL_DATA_KEYS.forEach(k=>{ if(Array.isArray(parsed[k])) localStorage.setItem(k,JSON.stringify(parsed[k])); });
+  load();
+  alert(t.importDone);
+ });
+}
 function confirmDelete(){
  const t=translations[currentLang]||translations.ar;
  return confirm(t.confirmDelete);
@@ -518,7 +570,15 @@ const translations={
  editBtn:'تعديل',
  deleteHeader:'حذف',
  editHeader:'تعديل',
- confirmDelete:'هل أنت متأكد من الحذف؟'
+ confirmDelete:'هل أنت متأكد من الحذف؟',
+ exportBtn:'تصدير',
+ importBtn:'استيراد',
+ backupAllBtn:'نسخ احتياطي شامل',
+ restoreAllBtn:'استعادة شاملة',
+ importError:'ملف غير صالح.',
+ importConfirm:'سيتم استبدال البيانات الحالية. متابعة؟',
+ restoreConfirm:'سيتم استبدال كل البيانات. متابعة؟',
+ importDone:'تمت الاستعادة بنجاح.'
  },
  tr:{
  headerSubtitle:'Müşteri, mağaza, fabrika, fiş ve hesap yönetimi',
@@ -601,7 +661,15 @@ const translations={
  editBtn:'Düzenle',
  deleteHeader:'Sil',
  editHeader:'Düzenle',
- confirmDelete:'Silmek istediğinize emin misiniz?'
+ confirmDelete:'Silmek istediğinize emin misiniz?',
+ exportBtn:'Dışa aktar',
+ importBtn:'İçe aktar',
+ backupAllBtn:'Tümünü yedekle',
+ restoreAllBtn:'Tümünü geri yükle',
+ importError:'Geçersiz dosya.',
+ importConfirm:'Mevcut veriler değiştirilecek. Devam edilsin mi?',
+ restoreConfirm:'Tüm veriler değiştirilecek. Devam edilsin mi?',
+ importDone:'Başarıyla geri yüklendi.'
  }
 };
 let currentLang='ar';
@@ -725,6 +793,13 @@ function setLanguage(lang){
  document.getElementById('currencyOpt2').textContent=t.currencyTry;
  const addInvoiceItemBtn=document.getElementById('addInvoiceItemBtn');
  if(addInvoiceItemBtn) addInvoiceItemBtn.textContent=t.addInvoiceItemBtn;
+ const setText=(id,val)=>{const el=document.getElementById(id); if(el) el.textContent=val;};
+ ['customersExportBtn','shopsExportBtn','factoriesExportBtn'].forEach(id=>setText(id,t.exportBtn));
+ ['customersImportBtn','shopsImportBtn','factoriesImportBtn'].forEach(id=>setText(id,t.importBtn));
+ setText('invoiceImportBtn',t.importBtn);
+ setText('accountImportBtn',t.importBtn);
+ setText('backupAllBtn',t.backupAllBtn);
+ setText('restoreAllBtn',t.restoreAllBtn);
  load();
 }
 load();
