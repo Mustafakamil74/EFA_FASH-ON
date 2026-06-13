@@ -46,11 +46,11 @@ th,td{border:1px solid #ccc;padding:6px}
 
 <div id="dashboard" class="page active"><div class="card"><h2 id="dashboardTitle">لوحة التحكم</h2><p id="dashboardDesc">نظام EFA FASHION</p><button id="backupAllBtn" type="button" onclick="backupAll()">نسخ احتياطي شامل</button> <button id="restoreAllBtn" type="button" onclick="restoreAll()">استعادة شاملة</button></div></div>
 
-<div id="customers" class="page"><div class="card"><h3 id="customersTitle">إضافة زبون</h3><input id="ccode" placeholder="كود الزبون"><input id="cname" placeholder="اسم الزبون"><input id="cphone" placeholder="هاتف"><input id="caddress" placeholder="العنوان"><input id="cnote" placeholder="ملاحظة"><button id="customersSaveBtn" type="button" onclick="addRecord('customersData')">حفظ</button> <button id="customersExportBtn" type="button" onclick="exportData('efa_customers.json','customersData')">تصدير</button> <button id="customersImportBtn" type="button" onclick="importData('customersData')">استيراد</button><div id="customersView"></div></div></div>
+<div id="customers" class="page"><div class="card"><h3 id="customersTitle">إضافة زبون</h3><input id="ccode" placeholder="كود الزبون"><input id="cname" placeholder="اسم الزبون"><input id="cphone" placeholder="هاتف"><input id="caddress" placeholder="العنوان"><input id="cnote" placeholder="ملاحظة"><button id="customersSaveBtn" type="button" onclick="addRecord('customersData')">حفظ</button> <button id="customersExportBtn" type="button" onclick="exportData('efa_customers.json','customersData')">تصدير</button> <button id="customersImportBtn" type="button" onclick="importData('customersData')">استيراد</button><input id="custSearch" oninput="load()" placeholder="بحث"><div id="customersView"></div></div></div>
 
-<div id="shops" class="page"><div class="card"><h3 id="shopsTitle">إضافة محل</h3><input id="scode" placeholder="كود المحل"><input id="sname" placeholder="اسم المحل"><input id="sphone" placeholder="هاتف"><input id="saddress" placeholder="عنوان"><input id="snote" placeholder="ملاحظة"><button id="shopsSaveBtn" type="button" onclick="addRecord('shopsData')">حفظ</button> <button id="shopsExportBtn" type="button" onclick="exportData('efa_shops.json','shopsData')">تصدير</button> <button id="shopsImportBtn" type="button" onclick="importData('shopsData')">استيراد</button><div id="shopsView"></div></div></div>
+<div id="shops" class="page"><div class="card"><h3 id="shopsTitle">إضافة محل</h3><input id="scode" placeholder="كود المحل"><input id="sname" placeholder="اسم المحل"><input id="sphone" placeholder="هاتف"><input id="saddress" placeholder="عنوان"><input id="snote" placeholder="ملاحظة"><button id="shopsSaveBtn" type="button" onclick="addRecord('shopsData')">حفظ</button> <button id="shopsExportBtn" type="button" onclick="exportData('efa_shops.json','shopsData')">تصدير</button> <button id="shopsImportBtn" type="button" onclick="importData('shopsData')">استيراد</button><input id="shopSearch" oninput="load()" placeholder="بحث"><div id="shopsView"></div></div></div>
 
-<div id="factories" class="page"><div class="card"><h3 id="factoriesTitle">إضافة معمل</h3><input id="fcode" placeholder="كود المعمل"><input id="fname" placeholder="اسم المعمل"><input id="fphone" placeholder="هاتف"><input id="faddress" placeholder="عنوان"><input id="fnote" placeholder="ملاحظة"><button id="factoriesSaveBtn" type="button" onclick="addRecord('factoriesData')">حفظ</button> <button id="factoriesExportBtn" type="button" onclick="exportData('efa_factories.json','factoriesData')">تصدير</button> <button id="factoriesImportBtn" type="button" onclick="importData('factoriesData')">استيراد</button><div id="factoriesView"></div></div></div>
+<div id="factories" class="page"><div class="card"><h3 id="factoriesTitle">إضافة معمل</h3><input id="fcode" placeholder="كود المعمل"><input id="fname" placeholder="اسم المعمل"><input id="fphone" placeholder="هاتف"><input id="faddress" placeholder="عنوان"><input id="fnote" placeholder="ملاحظة"><button id="factoriesSaveBtn" type="button" onclick="addRecord('factoriesData')">حفظ</button> <button id="factoriesExportBtn" type="button" onclick="exportData('efa_factories.json','factoriesData')">تصدير</button> <button id="factoriesImportBtn" type="button" onclick="importData('factoriesData')">استيراد</button><input id="factSearch" oninput="load()" placeholder="بحث"><div id="factoriesView"></div></div></div>
 
 <div id="invoices" class="page">
 <div class="card">
@@ -74,7 +74,7 @@ th,td{border:1px solid #ccc;padding:6px}
 <button id="invoiceSaveBtn" type="button" onclick="saveInvoice()">حفظ الإيصال</button>
 <button id="invoiceExportBtn" type="button" onclick="exportData('efa_invoices.json','efaInvoices')">تصدير الإيصالات</button>
 <button id="invoiceImportBtn" type="button" onclick="importData('efaInvoices')">استيراد الإيصالات</button>
-<div id="invoiceView"></div>
+<input id="invSearch" oninput="load()" placeholder="بحث"><div id="invoiceView"></div>
 </div></div>
 
 <div id="accounts" class="page">
@@ -93,7 +93,7 @@ th,td{border:1px solid #ccc;padding:6px}
   <button id="accountSaveBtn" type="button" onclick="saveAccount()">حفظ</button>
 <button id="accountExportBtn" type="button" onclick="exportData('efa_accounts.json','efaAccounts')">تصدير الحسابات</button>
 <button id="accountImportBtn" type="button" onclick="importData('efaAccounts')">استيراد الحسابات</button>
-<div id="accountView"></div>
+<input id="accSearch" oninput="load()" placeholder="بحث"><div id="accountView"></div>
 </div></div>
 
 <script>
@@ -107,6 +107,10 @@ function invoiceTotal(i){return getInvoiceItems(i).reduce((s,it)=>s+lineTotal(it
 function invoiceByNo(no){return JSON.parse(localStorage.getItem('efaInvoices')||'[]').find(i=>i.no===no)||null;}
 function invoicePaid(no){return JSON.parse(localStorage.getItem('efaAccounts')||'[]').filter(a=>a.invoice===no).reduce((s,a)=>s+toNum(a.amount),0);}
 function invoiceRemaining(no){const inv=invoiceByNo(no);return inv?invoiceTotal(inv)-invoicePaid(no):0;}
+function searchValue(id){const el=document.getElementById(id);return el?el.value.trim().toLowerCase():'';}
+function matchesQuery(obj,q){if(!q) return true;return Object.values(obj).some(v=>typeof v==='string'&&v.toLowerCase().includes(q));}
+function invoiceMatches(i,q){if(!q) return true;return [i.no,i.date,i.branch].concat(getInvoiceItems(i).map(it=>`${it.product||''} ${it.color||''}`)).join(' ').toLowerCase().includes(q);}
+function accountMatches(a,q){if(!q) return true;return [a.type,a.entityCode,a.entityName,a.invoice,a.date,a.amount,a.currency].join(' ').toLowerCase().includes(q);}
 function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active'); load();}
 const recordFields={
  customersData:{inputs:['ccode','cname','cphone','caddress','cnote'],props:['code','name','phone','address','note']},
@@ -593,7 +597,8 @@ const translations={
  importError:'ملف غير صالح.',
  importConfirm:'سيتم استبدال البيانات الحالية. متابعة؟',
  restoreConfirm:'سيتم استبدال كل البيانات. متابعة؟',
- importDone:'تمت الاستعادة بنجاح.'
+ importDone:'تمت الاستعادة بنجاح.',
+ searchPlaceholder:'بحث'
  },
  tr:{
  headerSubtitle:'Müşteri, mağaza, fabrika, fiş ve hesap yönetimi',
@@ -689,7 +694,8 @@ const translations={
  importError:'Geçersiz dosya.',
  importConfirm:'Mevcut veriler değiştirilecek. Devam edilsin mi?',
  restoreConfirm:'Tüm veriler değiştirilecek. Devam edilsin mi?',
- importDone:'Başarıyla geri yüklendi.'
+ importDone:'Başarıyla geri yüklendi.',
+ searchPlaceholder:'Ara'
  }
 };
 let currentLang='ar';
@@ -701,17 +707,20 @@ function load(){
  const invoiceView=document.getElementById('invoiceView');
  const accountView=document.getElementById('accountView');
  const customers=JSON.parse(localStorage.getItem('customersData')||'[]');
- customersView.innerHTML=customers.map((item,index)=>`<div><strong>${escapeHtml(item.code)}</strong> - ${escapeHtml(item.name)}<br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('customersData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('customersData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
+ const custQ=searchValue('custSearch');
+ customersView.innerHTML=customers.map((item,index)=>({item,index})).filter(({item})=>matchesQuery(item,custQ)).map(({item,index})=>`<div><strong>${escapeHtml(item.code)}</strong> - ${escapeHtml(item.name)}<br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('customersData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('customersData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
  const shops=JSON.parse(localStorage.getItem('shopsData')||'[]');
- shopsView.innerHTML=shops.map((item,index)=>`<div><strong>${escapeHtml(item.code)}</strong> - ${escapeHtml(item.name)}<br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('shopsData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('shopsData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
+ const shopQ=searchValue('shopSearch');
+ shopsView.innerHTML=shops.map((item,index)=>({item,index})).filter(({item})=>matchesQuery(item,shopQ)).map(({item,index})=>`<div><strong>${escapeHtml(item.code)}</strong> - ${escapeHtml(item.name)}<br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('shopsData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('shopsData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
  const factories=JSON.parse(localStorage.getItem('factoriesData')||'[]');
- factoriesView.innerHTML=factories.map((item,index)=>`<div><strong>${escapeHtml(item.code||'')}</strong>${item.code?' - ':''}${escapeHtml(item.name)}<br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('factoriesData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('factoriesData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
+ const factQ=searchValue('factSearch');
+ factoriesView.innerHTML=factories.map((item,index)=>({item,index})).filter(({item})=>matchesQuery(item,factQ)).map(({item,index})=>`<div><strong>${escapeHtml(item.code||'')}</strong>${item.code?' - ':''}${escapeHtml(item.name)}<br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('factoriesData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('factoriesData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
  const inv=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
- const invoiceTable = inv.length ? '<table><tr><th>'+t.invoiceNoHeader+'</th><th>'+t.invoiceDateHeader+'</th><th>'+t.invoiceBranchHeader+'</th><th>'+t.invoiceProductHeader+'</th><th>'+t.invoiceQtyHeader+'</th><th>'+t.invoiceColorHeader+'</th><th>'+t.invoicePriceHeader+'</th><th>'+t.invoiceTotalHeader+'</th><th>'+t.invoicePaidHeader+'</th><th>'+t.invoiceRemainingHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+inv.map((i,index)=>`<tr><td>${escapeHtml(i.no)}</td><td>${escapeHtml(i.date)}</td><td>${escapeHtml(i.branch||'')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.product||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.qty||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.color||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.price||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>lineTotal(it).toFixed(2)).join('<br>')}<br><strong>${invoiceTotal(i).toFixed(2)}</strong></td><td>${invoicePaid(i.no).toFixed(2)}</td><td>${invoiceRemaining(i.no).toFixed(2)}</td><td><button class="delete-btn" type="button" onclick="editInvoice(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteInvoice(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>' : '<div>'+t.noInvoices+'</div>';
+ const invoiceTable = inv.length ? '<table><tr><th>'+t.invoiceNoHeader+'</th><th>'+t.invoiceDateHeader+'</th><th>'+t.invoiceBranchHeader+'</th><th>'+t.invoiceProductHeader+'</th><th>'+t.invoiceQtyHeader+'</th><th>'+t.invoiceColorHeader+'</th><th>'+t.invoicePriceHeader+'</th><th>'+t.invoiceTotalHeader+'</th><th>'+t.invoicePaidHeader+'</th><th>'+t.invoiceRemainingHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+inv.map((i,index)=>({i,index})).filter(({i})=>invoiceMatches(i,searchValue('invSearch'))).map(({i,index})=>`<tr><td>${escapeHtml(i.no)}</td><td>${escapeHtml(i.date)}</td><td>${escapeHtml(i.branch||'')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.product||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.qty||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.color||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.price||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>lineTotal(it).toFixed(2)).join('<br>')}<br><strong>${invoiceTotal(i).toFixed(2)}</strong></td><td>${invoicePaid(i.no).toFixed(2)}</td><td>${invoiceRemaining(i.no).toFixed(2)}</td><td><button class="delete-btn" type="button" onclick="editInvoice(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteInvoice(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>' : '<div>'+t.noInvoices+'</div>';
  invoiceView.innerHTML=invoiceTable;
  const acc=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
  if(acc.length){
- accountView.innerHTML='<table><tr><th>'+t.accTypeHeader+'</th><th>'+t.accEntityHeader+'</th><th>'+t.accInvTableHeader+'</th><th>'+t.accountDateHeader+'</th><th>'+t.accAmountHeader+'</th><th>'+t.accountCurrencyHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+acc.map((a,index)=>`<tr><td>${escapeHtml(a.type)}</td><td>${a.entityCode?`${escapeHtml(a.entityCode)} - ${escapeHtml(a.entityName||'')}`:''}<br></td><td>${escapeHtml(a.invoice)}</td><td>${escapeHtml(a.date||'')}${a.checkDate?`<br>${t.checkDateLabel}: ${escapeHtml(a.checkDate)}`:''}${a.finalDate?`<br>${t.finalDateLabel}: ${escapeHtml(a.finalDate)}`:''}</td><td>${escapeHtml(a.amount)}</td><td>${escapeHtml(a.currency)}</td><td><button class="delete-btn" type="button" onclick="editAccount(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteAccount(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>';
+ accountView.innerHTML='<table><tr><th>'+t.accTypeHeader+'</th><th>'+t.accEntityHeader+'</th><th>'+t.accInvTableHeader+'</th><th>'+t.accountDateHeader+'</th><th>'+t.accAmountHeader+'</th><th>'+t.accountCurrencyHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+acc.map((a,index)=>({a,index})).filter(({a})=>accountMatches(a,searchValue('accSearch'))).map(({a,index})=>`<tr><td>${escapeHtml(a.type)}</td><td>${a.entityCode?`${escapeHtml(a.entityCode)} - ${escapeHtml(a.entityName||'')}`:''}<br></td><td>${escapeHtml(a.invoice)}</td><td>${escapeHtml(a.date||'')}${a.checkDate?`<br>${t.checkDateLabel}: ${escapeHtml(a.checkDate)}`:''}${a.finalDate?`<br>${t.finalDateLabel}: ${escapeHtml(a.finalDate)}`:''}</td><td>${escapeHtml(a.amount)}</td><td>${escapeHtml(a.currency)}</td><td><button class="delete-btn" type="button" onclick="editAccount(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteAccount(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>';
  } else {
  accountView.innerHTML='<div>'+t.noAccounts+'</div>';
  }
@@ -821,6 +830,7 @@ function setLanguage(lang){
  setText('accountImportBtn',t.importBtn);
  setText('backupAllBtn',t.backupAllBtn);
  setText('restoreAllBtn',t.restoreAllBtn);
+ ['custSearch','shopSearch','factSearch','invSearch','accSearch'].forEach(id=>{const el=document.getElementById(id); if(el) el.placeholder=t.searchPlaceholder;});
  load();
 }
 load();
