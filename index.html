@@ -43,6 +43,7 @@ th,td{border:1px solid #ccc;padding:6px}
   <button type="button" id="inventoryBtn" onclick="show('inventory')">المخزون</button>
   <button type="button" id="invoicesBtn" onclick="show('invoices')">الإيصالات</button>
   <button type="button" id="accountsBtn" onclick="show('accounts')">الحسابات</button>
+  <button type="button" id="reportsBtn" onclick="show('reports')">التقارير</button>
 </nav>
 
 <div id="dashboard" class="page active"><div class="card"><h2 id="dashboardTitle">لوحة التحكم</h2><p id="dashboardDesc">نظام EFA FASHION</p><button id="backupAllBtn" type="button" onclick="backupAll()">نسخ احتياطي شامل</button> <button id="restoreAllBtn" type="button" onclick="restoreAll()">استعادة شاملة</button></div></div>
@@ -79,6 +80,8 @@ th,td{border:1px solid #ccc;padding:6px}
 <button id="invoiceImportBtn" type="button" onclick="importData('efaInvoices')">استيراد الإيصالات</button>
 <input id="invSearch" oninput="load()" placeholder="بحث"><div id="invoiceView"></div>
 </div></div>
+
+<div id="reports" class="page"><div class="card"><h3 id="reportsTitle">التقارير</h3><div id="reportsView"></div></div></div>
 
 <div id="accounts" class="page">
 <div class="card">
@@ -123,6 +126,41 @@ function productSold(name){
 }
 function productOnHand(p){return toNum(p.opening)-productSold(p.name);}
 function lowStockProducts(){return JSON.parse(localStorage.getItem('productsData')||'[]').filter(p=>productOnHand(p)<=toNum(p.reorder));}
+function renderReports(){
+ const view=document.getElementById('reportsView');
+ if(!view) return;
+ const t=translations[currentLang]||translations.ar;
+ const invoices=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
+ const accounts=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
+ const totalSales=invoices.reduce((s,i)=>s+invoiceTotal(i),0);
+ const totalPaid=accounts.reduce((s,a)=>s+toNum(a.amount),0);
+ const byBranch={};
+ invoices.forEach(i=>{const b=i.branch||'-'; byBranch[b]=(byBranch[b]||0)+invoiceTotal(i);});
+ let salesHtml='<h4>'+t.salesReportTitle+'</h4><table><tr><th>'+t.reportMetric+'</th><th>'+t.reportValue+'</th></tr>'+
+   `<tr><td>${t.reportInvoiceCount}</td><td>${invoices.length}</td></tr>`+
+   `<tr><td>${t.reportTotalSales}</td><td>${totalSales.toFixed(2)}</td></tr>`+
+   `<tr><td>${t.reportTotalPaid}</td><td>${totalPaid.toFixed(2)}</td></tr>`+
+   `<tr><td>${t.reportOutstanding}</td><td>${(totalSales-totalPaid).toFixed(2)}</td></tr>`+
+   Object.keys(byBranch).map(b=>`<tr><td>${escapeHtml(b)}</td><td>${byBranch[b].toFixed(2)}</td></tr>`).join('')+'</table>';
+ const map={};
+ accounts.forEach(a=>{
+  const key=`${a.type}|${a.entityCode||''}|${a.entityName||''}`;
+  if(!map[key]) map[key]={type:a.type,code:a.entityCode||'',name:a.entityName||'',invoices:{},paid:0};
+  map[key].paid+=toNum(a.amount);
+  if(a.invoice) map[key].invoices[a.invoice]=true;
+ });
+ const entityRows=Object.values(map).map(e=>{
+  const invoiced=Object.keys(e.invoices).reduce((s,no)=>{const inv=invoiceByNo(no);return s+(inv?invoiceTotal(inv):0);},0);
+  return {...e,invoiced,remaining:invoiced-e.paid};
+ });
+ let balHtml='<h4>'+t.balancesReportTitle+'</h4>'+(entityRows.length?'<table><tr><th>'+t.accTypeHeader+'</th><th>'+t.accEntityHeader+'</th><th>'+t.reportInvoiced+'</th><th>'+t.invoicePaidHeader+'</th><th>'+t.invoiceRemainingHeader+'</th></tr>'+
+   entityRows.map(e=>`<tr><td>${escapeHtml(e.type)}</td><td>${escapeHtml(e.code?e.code+' - '+e.name:e.name)}</td><td>${e.invoiced.toFixed(2)}</td><td>${e.paid.toFixed(2)}</td><td>${e.remaining.toFixed(2)}</td></tr>`).join('')+'</table>':'<div>'+t.noData+'</div>');
+ const today=new Date().toISOString().slice(0,10);
+ const cheques=accounts.filter(a=>a.currency==='CHK').slice().sort((a,b)=>String(a.finalDate||'').localeCompare(String(b.finalDate||'')));
+ let chkHtml='<h4>'+t.chequeCalendarTitle+'</h4>'+(cheques.length?'<table><tr><th>'+t.accEntityHeader+'</th><th>'+t.accAmountHeader+'</th><th>'+t.checkDateLabel+'</th><th>'+t.finalDateLabel+'</th></tr>'+
+   cheques.map(c=>{const overdue=c.finalDate&&c.finalDate<today;return `<tr style="${overdue?'background:#fdecea':''}"><td>${escapeHtml(c.entityCode?c.entityCode+' - '+(c.entityName||''):(c.entityName||''))}</td><td>${toNum(c.amount).toFixed(2)}</td><td>${escapeHtml(c.checkDate||'')}</td><td>${overdue?'<strong>':''}${escapeHtml(c.finalDate||'')}${overdue?' \u26a0':''}${overdue?'</strong>':''}</td></tr>`;}).join('')+'</table>':'<div>'+t.noData+'</div>');
+ view.innerHTML=salesHtml+'<hr>'+balHtml+'<hr>'+chkHtml;
+}
 function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active'); load();}
 const recordFields={
  customersData:{inputs:['ccode','cname','cphone','caddress','cnote'],props:['code','name','phone','address','note']},
@@ -629,7 +667,20 @@ const translations={
  prodSoldHeader:'المباع',
  prodOnHandHeader:'المتوفر',
  noProducts:'لا توجد منتجات',
- lowStockTitle:'تنبيهات نفاد المخزون'
+ lowStockTitle:'تنبيهات نفاد المخزون',
+ navReports:'التقارير',
+ reportsTitle:'التقارير',
+ salesReportTitle:'ملخص المبيعات',
+ balancesReportTitle:'أرصدة الكيانات',
+ chequeCalendarTitle:'تقويم الشيكات',
+ reportMetric:'البيان',
+ reportValue:'القيمة',
+ reportInvoiceCount:'عدد الإيصالات',
+ reportTotalSales:'إجمالي المبيعات',
+ reportTotalPaid:'إجمالي المدفوع',
+ reportOutstanding:'المتبقي',
+ reportInvoiced:'المفوتر',
+ noData:'لا توجد بيانات'
  },
  tr:{
  headerSubtitle:'Müşteri, mağaza, fabrika, fiş ve hesap yönetimi',
@@ -744,7 +795,20 @@ const translations={
  prodSoldHeader:'Satılan',
  prodOnHandHeader:'Mevcut',
  noProducts:'Ürün yok',
- lowStockTitle:'Düşük Stok Uyarıları'
+ lowStockTitle:'Düşük Stok Uyarıları',
+ navReports:'Raporlar',
+ reportsTitle:'Raporlar',
+ salesReportTitle:'Satış Özeti',
+ balancesReportTitle:'Bakiyeler',
+ chequeCalendarTitle:'Çek Takvimi',
+ reportMetric:'Metrik',
+ reportValue:'Değer',
+ reportInvoiceCount:'Fiş Sayısı',
+ reportTotalSales:'Toplam Satış',
+ reportTotalPaid:'Toplam Ödeme',
+ reportOutstanding:'Kalan',
+ reportInvoiced:'Faturalanan',
+ noData:'Veri yok'
  }
 };
 let currentLang='ar';
@@ -808,6 +872,7 @@ try{
    lowBox.innerHTML='<h4>'+t.lowStockTitle+'</h4>'+list;
  } else if(lowBox){ lowBox.innerHTML=''; }
 }catch(e){}
+ renderReports();
  if(currentInvoiceEditIndex<0) setNextInvoiceNumber();
  populateInvoiceSelect();
 }
@@ -894,6 +959,8 @@ function setLanguage(lang){
  setPh('pcode',t.prodCodePlaceholder);setPh('pname',t.prodNamePlaceholder);setPh('pcolor',t.prodColorPlaceholder);setPh('pprice',t.prodPricePlaceholder);setPh('popening',t.prodOpeningPlaceholder);setPh('preorder',t.prodReorderPlaceholder);setPh('prodSearch',t.searchPlaceholder);
  document.getElementById('invoicesBtn').textContent=t.navInvoices;
  document.getElementById('accountsBtn').textContent=t.navAccounts;
+ setText('reportsBtn',t.navReports);
+ setText('reportsTitle',t.reportsTitle);
  document.getElementById('currencyOpt1').textContent=t.currencyDollar;
  document.getElementById('currencyOpt2').textContent=t.currencyTry;
  const addInvoiceItemBtn=document.getElementById('addInvoiceItemBtn');
