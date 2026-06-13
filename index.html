@@ -104,6 +104,9 @@ function toNum(value){const n=parseFloat(value);return isFinite(n)?n:0;}
 function getInvoiceItems(i){return Array.isArray(i.items)&&i.items.length?i.items:[{product:i.product||'',color:i.color||'',qty:i.qty||'',price:i.price||''}];}
 function lineTotal(it){return toNum(it.qty)*toNum(it.price);}
 function invoiceTotal(i){return getInvoiceItems(i).reduce((s,it)=>s+lineTotal(it),0);}
+function invoiceByNo(no){return JSON.parse(localStorage.getItem('efaInvoices')||'[]').find(i=>i.no===no)||null;}
+function invoicePaid(no){return JSON.parse(localStorage.getItem('efaAccounts')||'[]').filter(a=>a.invoice===no).reduce((s,a)=>s+toNum(a.amount),0);}
+function invoiceRemaining(no){const inv=invoiceByNo(no);return inv?invoiceTotal(inv)-invoicePaid(no):0;}
 function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active'); load();}
 const recordFields={
  customersData:{inputs:['ccode','cname','cphone','caddress','cnote'],props:['code','name','phone','address','note']},
@@ -321,7 +324,6 @@ function populateInvoiceSelect(currentInvoice){
  const select=document.getElementById('accinv');
  const invoices=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
  const accounts=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
- const used=accounts.map(a=>a.invoice);
  const t=translations[currentLang]||translations.ar;
  select.innerHTML='';
  const placeholder=document.createElement('option');
@@ -333,10 +335,9 @@ function populateInvoiceSelect(currentInvoice){
  let currentInvoiceAdded=false;
  invoices.forEach(item=>{
  if(!item.no) return;
- if(used.includes(item.no) && item.no!==currentInvoice) return;
  const option=document.createElement('option');
  option.value=item.no;
- option.textContent=`${item.no}${item.date?` (${item.date})`:''}`;
+ option.textContent=`${item.no}${item.date?` (${item.date})`:''} — ${t.remainingLabel}: ${invoiceRemaining(item.no).toFixed(2)}`;
  if(item.no===currentInvoice) currentInvoiceAdded=true;
  select.appendChild(option);
  });
@@ -546,6 +547,9 @@ const translations={
  invoiceColorHeader:'اللون',
  invoicePriceHeader:'السعر',
  invoiceTotalHeader:'الإجمالي',
+ invoicePaidHeader:'المدفوع',
+ invoiceRemainingHeader:'المتبقي',
+ remainingLabel:'المتبقي',
  noInvoices:'لا توجد إيصالات',
  addInvoiceItemBtn:'+ إضافة منتج',
  noAccounts:'لا توجد حسابات',
@@ -640,6 +644,9 @@ const translations={
  invoiceColorHeader:'Renk',
  invoicePriceHeader:'Fiyat',
  invoiceTotalHeader:'Toplam',
+ invoicePaidHeader:'Ödenen',
+ invoiceRemainingHeader:'Kalan',
+ remainingLabel:'Kalan',
  noInvoices:'Fiş yok',
  noAccounts:'Hesap yok',
  accInvTableHeader:'Fiş Numarası',
@@ -700,7 +707,7 @@ function load(){
  const factories=JSON.parse(localStorage.getItem('factoriesData')||'[]');
  factoriesView.innerHTML=factories.map((item,index)=>`<div><strong>${escapeHtml(item.code||'')}</strong>${item.code?' - ':''}${escapeHtml(item.name)}<br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('factoriesData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('factoriesData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
  const inv=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
- const invoiceTable = inv.length ? '<table><tr><th>'+t.invoiceNoHeader+'</th><th>'+t.invoiceDateHeader+'</th><th>'+t.invoiceBranchHeader+'</th><th>'+t.invoiceProductHeader+'</th><th>'+t.invoiceQtyHeader+'</th><th>'+t.invoiceColorHeader+'</th><th>'+t.invoicePriceHeader+'</th><th>'+t.invoiceTotalHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+inv.map((i,index)=>`<tr><td>${escapeHtml(i.no)}</td><td>${escapeHtml(i.date)}</td><td>${escapeHtml(i.branch||'')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.product||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.qty||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.color||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.price||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>lineTotal(it).toFixed(2)).join('<br>')}<br><strong>${invoiceTotal(i).toFixed(2)}</strong></td><td><button class="delete-btn" type="button" onclick="editInvoice(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteInvoice(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>' : '<div>'+t.noInvoices+'</div>';
+ const invoiceTable = inv.length ? '<table><tr><th>'+t.invoiceNoHeader+'</th><th>'+t.invoiceDateHeader+'</th><th>'+t.invoiceBranchHeader+'</th><th>'+t.invoiceProductHeader+'</th><th>'+t.invoiceQtyHeader+'</th><th>'+t.invoiceColorHeader+'</th><th>'+t.invoicePriceHeader+'</th><th>'+t.invoiceTotalHeader+'</th><th>'+t.invoicePaidHeader+'</th><th>'+t.invoiceRemainingHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+inv.map((i,index)=>`<tr><td>${escapeHtml(i.no)}</td><td>${escapeHtml(i.date)}</td><td>${escapeHtml(i.branch||'')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.product||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.qty||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.color||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.price||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>lineTotal(it).toFixed(2)).join('<br>')}<br><strong>${invoiceTotal(i).toFixed(2)}</strong></td><td>${invoicePaid(i.no).toFixed(2)}</td><td>${invoiceRemaining(i.no).toFixed(2)}</td><td><button class="delete-btn" type="button" onclick="editInvoice(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteInvoice(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>' : '<div>'+t.noInvoices+'</div>';
  invoiceView.innerHTML=invoiceTable;
  const acc=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
  if(acc.length){
