@@ -386,9 +386,14 @@ function exportData(file,key){
  a.download=file;
  a.click();
 }
+function confirmDelete(){
+ const t=translations[currentLang]||translations.ar;
+ return confirm(t.confirmDelete);
+}
 function deleteSimple(key,index){
  const data=JSON.parse(localStorage.getItem(key)||'[]');
  if(index<0||index>=data.length) return;
+ if(!confirmDelete()) return;
  data.splice(index,1);
  localStorage.setItem(key,JSON.stringify(data));
  load();
@@ -396,6 +401,7 @@ function deleteSimple(key,index){
 function deleteInvoice(index){
  const data=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
  if(index<0||index>=data.length) return;
+ if(!confirmDelete()) return;
  data.splice(index,1);
  if(currentInvoiceEditIndex===index){
  currentInvoiceEditIndex=-1;
@@ -410,6 +416,7 @@ function deleteInvoice(index){
 function deleteAccount(index){
  const data=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
  if(index<0||index>=data.length) return;
+ if(!confirmDelete()) return;
  data.splice(index,1);
  if(currentAccountEditIndex===index){
  currentAccountEditIndex=-1;
@@ -495,7 +502,8 @@ const translations={
  deleteBtn:'حذف',
  editBtn:'تعديل',
  deleteHeader:'حذف',
- editHeader:'تعديل'
+ editHeader:'تعديل',
+ confirmDelete:'هل أنت متأكد من الحذف؟'
  },
  tr:{
  headerSubtitle:'Müşteri, mağaza, fabrika, fiş ve hesap yönetimi',
@@ -576,7 +584,8 @@ const translations={
  deleteBtn:'Sil',
  editBtn:'Düzenle',
  deleteHeader:'Sil',
- editHeader:'Düzenle'
+ editHeader:'Düzenle',
+ confirmDelete:'Silmek istediğinize emin misiniz?'
  }
 };
 let currentLang='ar';
