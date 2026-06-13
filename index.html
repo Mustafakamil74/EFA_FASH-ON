@@ -65,8 +65,8 @@ th,td{border:1px solid #ccc;padding:6px}
   <div class="item-row">
     <input class="invoice-product" placeholder="اسم المنتج">
     <input class="invoice-color" placeholder="اللون">
-    <input class="invoice-qty" placeholder="العدد">
-    <input class="invoice-price" placeholder="السعر">
+    <input class="invoice-qty" type="number" min="0" step="any" placeholder="العدد">
+    <input class="invoice-price" type="number" min="0" step="any" placeholder="السعر">
     <button type="button" class="item-delete-btn" onclick="removeInvoiceItem(this)">×</button>
   </div>
 </div>
@@ -84,7 +84,7 @@ th,td{border:1px solid #ccc;padding:6px}
   <select id="accinv"><option value="" id="accInvPlaceholderOption">رقم الإيصال</option></select>
   <input type="date" id="accdate">
   <select id="currency"><option value="USD" id="currencyOpt1">دولار</option><option value="TRY" id="currencyOpt2">ليرة تركية</option><option value="CHK" id="currencyOpt3">شيك</option></select>
-  <input id="amount" placeholder="المبلغ">
+  <input id="amount" type="number" min="0" step="any" placeholder="المبلغ">
   <div id="checkFields" style="display:none">
     <input type="date" id="checkDate" placeholder="تاريخ الشيك">
     <input type="date" id="finalDate" placeholder="تاريخ آخر سداد">
@@ -98,6 +98,10 @@ th,td{border:1px solid #ccc;padding:6px}
 function escapeHtml(value){
  return String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+function toNum(value){const n=parseFloat(value);return isFinite(n)?n:0;}
+function getInvoiceItems(i){return Array.isArray(i.items)&&i.items.length?i.items:[{product:i.product||'',color:i.color||'',qty:i.qty||'',price:i.price||''}];}
+function lineTotal(it){return toNum(it.qty)*toNum(it.price);}
+function invoiceTotal(i){return getInvoiceItems(i).reduce((s,it)=>s+lineTotal(it),0);}
 function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active'); load();}
 const recordFields={
  customersData:{inputs:['ccode','cname','cphone','caddress','cnote'],props:['code','name','phone','address','note']},
@@ -114,8 +118,8 @@ function addInvoiceItem(product='', color='', qty='', price=''){
  row.className='item-row';
  row.innerHTML=`<input class="invoice-product" placeholder="${t.invProductPlaceholder}" value="${escapeHtml(product)}">`+
                `<input class="invoice-color" placeholder="${t.invColorPlaceholder}" value="${escapeHtml(color)}">`+
-               `<input class="invoice-qty" placeholder="${t.invQtyPlaceholder}" value="${escapeHtml(qty)}">`+
-               `<input class="invoice-price" placeholder="${t.invPricePlaceholder}" value="${escapeHtml(price)}">`+
+               `<input class="invoice-qty" type="number" min="0" step="any" placeholder="${t.invQtyPlaceholder}" value="${escapeHtml(qty)}">`+
+               `<input class="invoice-price" type="number" min="0" step="any" placeholder="${t.invPricePlaceholder}" value="${escapeHtml(price)}">`+
                `<button type="button" class="item-delete-btn" onclick="removeInvoiceItem(this)">×</button>`;
  container.appendChild(row);
 }
@@ -179,7 +183,12 @@ function saveInvoice(){
  return;
  }
  if(items.some(item=>item.product && (!item.qty || !item.price))){
- const messages={ar:'Her ürün için adet ve fiyat giriniz.',tr:'Her ürün için adet ve fiyat giriniz.'};
+ const messages={ar:'يرجى إدخال العدد والسعر لكل منتج.',tr:'Her ürün için adet ve fiyat giriniz.'};
+ alert(messages[currentLang]||messages.ar);
+ return;
+ }
+ if(items.some(item=>toNum(item.qty)<=0 || toNum(item.price)<0)){
+ const messages={ar:'العدد والسعر يجب أن يكونا أرقاماً صالحة.',tr:'Adet ve fiyat geçerli sayı olmalıdır.'};
  alert(messages[currentLang]||messages.ar);
  return;
  }
@@ -245,6 +254,11 @@ function saveAccount(){
  }
  if(!invoice || !amount){
  const messages={ar:'رقم الإيصال والمبلغ مطلوبان. يرجى التحقق.',tr:'Fiş numarası ve tutar zorunludur. Lütfen kontrol edin.'};
+ alert(messages[currentLang]||messages.ar);
+ return;
+ }
+ if(toNum(amount)<=0){
+ const messages={ar:'المبلغ يجب أن يكون رقماً صالحاً.',tr:'Tutar geçerli bir sayı olmalıdır.'};
  alert(messages[currentLang]||messages.ar);
  return;
  }
@@ -468,6 +482,7 @@ const translations={
  invoiceQtyHeader:'عدد',
  invoiceColorHeader:'اللون',
  invoicePriceHeader:'السعر',
+ invoiceTotalHeader:'الإجمالي',
  noInvoices:'لا توجد إيصالات',
  addInvoiceItemBtn:'+ إضافة منتج',
  noAccounts:'لا توجد حسابات',
@@ -551,6 +566,7 @@ const translations={
  invoiceQtyHeader:'Adet',
  invoiceColorHeader:'Renk',
  invoicePriceHeader:'Fiyat',
+ invoiceTotalHeader:'Toplam',
  noInvoices:'Fiş yok',
  noAccounts:'Hesap yok',
  accInvTableHeader:'Fiş Numarası',
@@ -603,7 +619,7 @@ function load(){
  const factories=JSON.parse(localStorage.getItem('factoriesData')||'[]');
  factoriesView.innerHTML=factories.map((item,index)=>`<div><strong>${escapeHtml(item.name)}</strong><br>${escapeHtml(item.phone)}<br>${escapeHtml(item.address)}<br>${escapeHtml(item.note)}<br><button class="delete-btn" type="button" onclick="editRecord('factoriesData',${index})">${t.editBtn}</button> <button class="delete-btn" type="button" onclick="deleteSimple('factoriesData',${index})">${t.deleteBtn}</button></div>`).join('<hr>')||'<div></div>';
  const inv=JSON.parse(localStorage.getItem('efaInvoices')||'[]');
- const invoiceTable = inv.length ? '<table><tr><th>'+t.invoiceNoHeader+'</th><th>'+t.invoiceDateHeader+'</th><th>'+t.invoiceBranchHeader+'</th><th>'+t.invoiceProductHeader+'</th><th>'+t.invoiceQtyHeader+'</th><th>'+t.invoiceColorHeader+'</th><th>'+t.invoicePriceHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+inv.map((i,index)=>`<tr><td>${escapeHtml(i.no)}</td><td>${escapeHtml(i.date)}</td><td>${escapeHtml(i.branch||'')}</td><td>${Array.isArray(i.items)?i.items.map(it=>escapeHtml(it.product||'')).join('<br>'):escapeHtml(i.product||'')}</td><td>${Array.isArray(i.items)?i.items.map(it=>escapeHtml(it.qty||'')).join('<br>'):escapeHtml(i.qty||'')}</td><td>${Array.isArray(i.items)?i.items.map(it=>escapeHtml(it.color||'')).join('<br>'):escapeHtml(i.color||'')}</td><td>${Array.isArray(i.items)?i.items.map(it=>escapeHtml(it.price||'')).join('<br>'):escapeHtml(i.price||'')}</td><td><button class="delete-btn" type="button" onclick="editInvoice(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteInvoice(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>' : '<div>'+t.noInvoices+'</div>';
+ const invoiceTable = inv.length ? '<table><tr><th>'+t.invoiceNoHeader+'</th><th>'+t.invoiceDateHeader+'</th><th>'+t.invoiceBranchHeader+'</th><th>'+t.invoiceProductHeader+'</th><th>'+t.invoiceQtyHeader+'</th><th>'+t.invoiceColorHeader+'</th><th>'+t.invoicePriceHeader+'</th><th>'+t.invoiceTotalHeader+'</th><th>'+t.editHeader+'</th><th>'+t.deleteHeader+'</th></tr>'+inv.map((i,index)=>`<tr><td>${escapeHtml(i.no)}</td><td>${escapeHtml(i.date)}</td><td>${escapeHtml(i.branch||'')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.product||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.qty||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.color||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>escapeHtml(it.price||'')).join('<br>')}</td><td>${getInvoiceItems(i).map(it=>lineTotal(it).toFixed(2)).join('<br>')}<br><strong>${invoiceTotal(i).toFixed(2)}</strong></td><td><button class="delete-btn" type="button" onclick="editInvoice(${index})">${t.editBtn}</button></td><td><button class="delete-btn" type="button" onclick="deleteInvoice(${index})">${t.deleteBtn}</button></td></tr>`).join('')+'</table>' : '<div>'+t.noInvoices+'</div>';
  invoiceView.innerHTML=invoiceTable;
  const acc=JSON.parse(localStorage.getItem('efaAccounts')||'[]');
  if(acc.length){
